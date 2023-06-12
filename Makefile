@@ -1,7 +1,8 @@
 NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
 SRCS = main.cpp
-INC = 
+INCS = headers.hpp
+INC = $(patsubst %.hpp, ./inc/%.hpp, $(INCS))
 OBJ_PATH = ./objs/
 OBJS = $(patsubst %.cpp,$(OBJ_PATH)%.o,$(SRCS))
 
@@ -16,7 +17,7 @@ $(NAME): $(OBJ_PATH) $(OBJS)
 	@echo " \____| \___/  _|  _| _|    ___| _____| _____| ____/  _) \033[0m"
 	@echo "                                                         "
 
-$(OBJ_PATH)%.o: %.cpp $(INC)
+$(OBJ_PATH)%.o: srcs/%.cpp $(INC)
 	@c++ $(FLAGS) -c $< -o $@
 
 $(OBJ_PATH):
