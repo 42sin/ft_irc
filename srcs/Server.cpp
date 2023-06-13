@@ -1,11 +1,18 @@
 #include "../inc/Server.hpp"
 
+bool online = true;
+
+void	shutdown(int sig) {
+	(void)sig;
+	online = false;
+}
+
 Server::Server() :_port(0), _password(NULL), _serverSocketFd(0), _clients(0, 0) {
 }
 
 Server::~Server() {
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "Closing client fd: " << _clients[i] << std::endl;
+		std::cout << std::endl << "Closing client fd: " << _clients[i] << std::endl;
 		if (_clients[i] > 0) {
 			close(_clients[i]);
 			_clients[i] = -1;
@@ -20,13 +27,6 @@ Server::Server(const int port, const char* password) : _port(port), _password(pa
 		throw std::runtime_error("Error creating socket");
 	}
 	Server::initServer();
-}
-
-bool online = true;
-
-void	shutdown(int sig) {
-	(void)sig;
-	online = false;
 }
 
 void	Server::initServer(void) {
@@ -51,66 +51,22 @@ void	Server::initServer(void) {
 
 void	Server::run(void) {
 	while (online) {
-		std::vector<pollfd> pollFds;
-	
-		pollfd	serverPollFd;
-		serverPollFd.fd = _serverSocketFd;
-		serverPollFd.events = POLLIN;
-		pollFds.push_back(serverPollFd);
-
-		for (size_t i = 0; i < _clients.size(); i++) {
-			pollfd clientPollFd;
-			clientPollFd.fd = _clients[i];
-			clientPollFd.events = POLLIN;
-			pollFds.push_back(clientPollFd);
-		}
-	
-		if (poll(&pollFds[0], pollFds.size(), -1) == -1) {
-			if (errno == EINTR) {
+		if (controlPolls() == false)
+			continue ;
+		for (size_t i = 0; i < _pollFds.size(); i++) {
+			if (_pollFds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+				closeConnection(i);
+				i--;
 				continue ;
 			}
-			throw std::runtime_error("Error in poll()");
-		}
-
-		std::vector<int> clientsToRemove;
-
-		for (size_t i = 0; i < pollFds.size(); i++) {
-			if (pollFds[i].revents & POLLIN) {
-				if (pollFds[i].fd == _serverSocketFd) {
-					int clientFd = accept(_serverSocketFd, NULL, NULL);
-					_clients.push_back(clientFd);
-					std::cout << "New client connected: " << clientFd << std::endl;
-				}
-				else {
-					int clientFd = pollFds[i].fd;
-					char buffer[1028];
-					memset(buffer, 0, sizeof(buffer));
-					ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-					if (bytesRead > 0) {
-						std::cout << "received from client " << clientFd << ": " << buffer;
-					}
-					else if (bytesRead == 0) {
-						// Verbindung vom Client getrennt
-						std::cout << "Client disconnected: " << clientFd << std::endl;
-						// Markiere den Client zum Entfernen
-						clientsToRemove.push_back(clientFd);
-					}
-					else {
-						std::cerr << "Error receiving data from client: " << strerror(errno) << std::endl;
-					}
-				}
+			if (_pollFds[i].revents & POLLIN) {
+				receive(i);
+			}
+			if (_pollFds[i].revents & POLLOUT) {
+				//send something
 			}
 		}
-
-		// Entferne die markierten Clients
-		for (size_t i = 0; i < clientsToRemove.size(); i++) {
-			int clientFd = clientsToRemove[i];
-			close(clientFd);
-			std::vector<int>::iterator it = std::find(_clients.begin(), _clients.end(), clientFd);
-			if (it != _clients.end()) {
-				_clients.erase(it);
-			}
-		}
+		removeDisconnectedClients();
 	(void)_password;
 	}
 }

@@ -1,6 +1,6 @@
 NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
-SRCS = main.cpp Server.cpp
+SRCS = main.cpp Server.cpp ServerUtils.cpp
 INCS = headers.hpp Server.hpp
 INC = $(patsubst %.hpp, ./inc/%.hpp, $(INCS))
 OBJ_PATH = ./objs/
