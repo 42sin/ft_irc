@@ -7,5 +7,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <poll.h>
+#include <vector>
 
 #endif
