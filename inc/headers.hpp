@@ -11,5 +11,6 @@
 #include <poll.h>
 #include <vector>
 #include <algorithm>
+#include "Buffer.hpp"
 
 #endif

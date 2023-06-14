@@ -18,6 +18,8 @@ class Server {
 	void	closeConnection(int index);
 	void	receive(int index);
 	void	removeDisconnectedClients(void);
+	void	sendToSocket(int index);
+	void	sendMessage(std::string	msg, int fd);
 public:
 	Server();
 	Server(const int port, const char* password);

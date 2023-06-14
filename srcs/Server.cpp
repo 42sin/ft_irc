@@ -40,6 +40,9 @@ void	Server::initServer(void) {
 	socketAdress.sin_port = htons(_port);
 	socketAdress.sin_addr.s_addr = htonl(INADDR_ANY);
 
+	int value = 1;
+	if (setsockopt(_serverSocketFd, SOL_SOCKET, SO_REUSEPORT, &value, sizeof(value)) == -1)
+		throw std::runtime_error("setsockopt(fd, SOL_SOCKET, ...) returned Error");
 	if (bind(_serverSocketFd, (struct sockaddr*)&socketAdress, sizeof(socketAdress)) < 0) {
 		throw std::runtime_error("Bind failed");
 	}
@@ -63,10 +66,10 @@ void	Server::run(void) {
 				receive(i);
 			}
 			if (_pollFds[i].revents & POLLOUT) {
-				//send something
+				sendToSocket(i);
 			}
 		}
 		removeDisconnectedClients();
-	(void)_password;
 	}
+	(void)_password;
 }
