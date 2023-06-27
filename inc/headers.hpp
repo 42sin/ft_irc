@@ -12,5 +12,6 @@
 #include <vector>
 #include <algorithm>
 #include "Buffer.hpp"
+#include "Command.hpp"
 
 #endif

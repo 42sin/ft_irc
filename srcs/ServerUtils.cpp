@@ -54,7 +54,8 @@ void	Server::receive(int index) {
 		memset(buffer, 0, sizeof(buffer));
 		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 		if (bytesRead > 0) {
-			std::cout << "received from client " << clientFd << ": " << buffer;
+			Command	newCmd(buffer);
+			//std::cout << "received from client " << clientFd << ": " << buffer;
 		}
 		else if (bytesRead == 0) {
 			std::cout << "Client disconnected: " << clientFd << std::endl;

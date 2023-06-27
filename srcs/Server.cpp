@@ -11,8 +11,9 @@ Server::Server() :_port(0), _password(NULL), _serverSocketFd(0), _clients(0, 0) 
 }
 
 Server::~Server() {
+	std::cout << std::endl;
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << std::endl << "Closing client fd: " << _clients[i] << std::endl;
+		std::cout << "Closing client fd: " << _clients[i] << std::endl;
 		if (_clients[i] > 0) {
 			close(_clients[i]);
 			_clients[i] = -1;
