@@ -18,23 +18,52 @@ void	Command::removePrefix(std::string& cmd) {
 
 void	Command::parseCommandName(std::string &cmd) {
 	size_t end = cmd.find(' ', 0);
-	if (end == std::string::npos)
-		throw std::runtime_error("No parameters");
+	if (end == std::string::npos) {
+		_command = cmd;
+		cmd.erase(0);
+	}
 	else {
-		this->command = cmd.substr(0, end);
+		this->_command = cmd.substr(0, end);
 		cmd.erase(0, end + 1);
 	}
 }
 
-void	Command::parseParameters(std::string& cmd) { // still needs to be edited because there can be multiple parameters each separated with space
-	size_t end = cmd.find(' ', 0);
-	if (end == std::string::npos)
-		this->params = std::string("");
+void	Command::parseParameters(std::string& cmd) {
+	if (cmd.empty()) {
+		_params.push_back("");
+		return ;
+	}
+	size_t startPos = 0;
+	size_t endPos = 0;
+	while (endPos != std::string::npos) {
+		startPos = cmd.find_first_not_of(' ', endPos);
+		if (startPos == std::string::npos)
+			break ;
+		if (cmd[startPos] == ':')
+			break ;
+		endPos = cmd.find(' ', startPos);
+		_params.push_back(cmd.substr(startPos, endPos - startPos));
+	}
+	if (endPos != std::string::npos)
+		cmd.erase(0, endPos + 1);
+	else
+		cmd.clear();
+}
+
+void	Command::parseTrailing(std::string &cmd) {
+	if (cmd.empty()) {
+		_trailing = std::string("");
+		return ;
+	}
+	size_t colonPos = cmd.find(':', 0);
+	if (colonPos == std::string::npos)
+		_trailing = std::string("");
 	else {
-		this->params = cmd.substr(0, end);
-		cmd.erase(0, end + 1);
+		_trailing = cmd.substr(colonPos + 1);
+		cmd.erase(colonPos);
 	}
 }
+
 
 void	Command::parseCommand(std::string& cmd) {
 	if (cmd.size() <= 2 || cmd.substr(cmd.size() - 2) != "\r\n")
@@ -44,7 +73,16 @@ void	Command::parseCommand(std::string& cmd) {
 	removePrefix(cmd);
 	parseCommandName(cmd);
 	parseParameters(cmd);
-	this->trailing = cmd;
+	parseTrailing(cmd);
+	printCmdInfo();
+}
+
+void	Command::printCmdInfo(void) {
+	std::cout << std::endl << "Command name: [" << this->_command << "]" << std::endl << "Parameters: ";
+	for (std::vector<std::string>::iterator it = _params.begin(); it != _params.end(); it++) {
+		std::cout << "[" << *it << "]";
+	}
+	std::cout << std::endl << "Trailing: [" << _trailing << "]" << std::endl;
 }
 
 Command::Command(std::string buf) {
