@@ -1,6 +1,7 @@
 #include "../inc/Command.hpp"
 
-Command::Command(std::string buf) {
+Command::Command(std::string buf, int clientFd) : _buffer("") {
+	_clientFd = clientFd;
 	try {
 		parseCommand(buf);
 		executeCommand();

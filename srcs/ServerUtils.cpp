@@ -74,7 +74,7 @@ void	Server::receive(int index) {
 		ssize_t bytesRead = 0;
 		std::string buffer = readBuffer(bytesRead, clientFd);
 		if (bytesRead > 0) {
-			Command	newCmd(buffer);
+			_commands.push(Command(buffer, clientFd));
 		}
 		else if (bytesRead == 0) {
 			std::cout << "Client disconnected: " << clientFd << std::endl;
@@ -86,21 +86,14 @@ void	Server::receive(int index) {
 	}
 }
 
-// void	Server::sendMessage(std::string msg, int fd) {
-// 	ssize_t	bytesSent = send(fd, msg.c_str(), msg.size(), 0);
-// 	if (bytesSent > 0) {
-// 		std::cout << "Message sent to client: " << fd << std::endl;
-// 	}
-// 	else if (bytesSent == 0) {
-// 		std::cout << "Client disconnected: " << fd << std::endl;
-// 		_disconnectedClients.push_back(fd);
-// 	}
-// 	else {
-// 		std::cerr << "Error sending data to client: " << strerror(errno) << std::endl;
-// 	}
-// }
-
 void	Server::sendToSocket(int index) {
 	if (_pollFds[index].fd != _serverSocketFd) {
+		if (!_commands.empty()) {
+			Command	cmd = _commands.front();
+			_commands.pop();
+			if (!cmd.getBuffer().empty()) {
+				send(cmd.getFd(), cmd.getBuffer().data(), cmd.getBuffer().size(), 0);
+			}
+		}
 	}
 }

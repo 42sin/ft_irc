@@ -13,5 +13,6 @@
 #include <algorithm>
 #include "Buffer.hpp"
 #include "Command.hpp"
+#include <queue>
 
 #endif
