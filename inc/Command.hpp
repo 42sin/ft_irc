@@ -17,6 +17,7 @@ class Command {
 	void	parseParameters(std::string&);
 	void	parseTrailing(std::string&);
 	void	printCmdInfo(void);
+	void	executeCommand(void);
 public:
 	Command(std::string);
 	Command();

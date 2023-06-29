@@ -13,7 +13,6 @@ int main(int argc, char *argv[]) {
 		}
 		Server server(port, argv[2]);
 		server.run();
-		
 	}
 	catch (std::exception &e) {
 		std::cerr << e.what() << std::endl;
