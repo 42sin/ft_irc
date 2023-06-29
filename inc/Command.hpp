@@ -8,7 +8,11 @@
 #include "Responses.hpp"
 
 enum vars {
-	AUTHENTICATED = FALSE
+	AUTHENTICATED,;
+}
+
+namespace vars- {
+	AUTHENTICATED = FALSE,
 }
 
 class Command {
@@ -33,7 +37,7 @@ public:
 	~Command();
 
 	bool checkPass(std::string input_pass);
-	void executePass();
+	std::string executePass();
 };
 
 #endif
