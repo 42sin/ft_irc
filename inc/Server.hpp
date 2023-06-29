@@ -3,7 +3,6 @@
 
 #include "headers.hpp"
 
-
 class Server {
 	const int			_port;
 	const char*			_password;
@@ -11,6 +10,7 @@ class Server {
 	std::vector<int>	_clients;
 	std::vector<pollfd>	_pollFds;
 	std::vector<int>	_disconnectedClients;
+	std::queue<Command>	_commands;
 
 	void		initServer(void);
 	void		addSocketToPoll(int socketFd, short events);

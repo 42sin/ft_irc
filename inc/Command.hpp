@@ -5,6 +5,7 @@
 #include <exception>
 #include <vector>
 #include <iostream>
+#include "Responses.hpp"
 
 enum vars {
 	AUTHENTICATED = FALSE
@@ -14,6 +15,8 @@ class Command {
 	std::string					_command;
 	std::vector<std::string>	_params;
 	std::string					_trailing;
+	int							_clientFd;
+	std::string					_buffer;
 
 	void	removePrefix(std::string&);
 	void	parseCommand(std::string&);
@@ -23,7 +26,9 @@ class Command {
 	void	printCmdInfo(void);
 	void	executeCommand(void);
 public:
-	Command(std::string);
+	std::string	getBuffer(void) const { return _buffer; };
+	int			getFd(void) const { return _clientFd; };
+	Command(std::string, int clientFd);
 	Command();
 	~Command();
 
