@@ -75,7 +75,6 @@ void	Server::receive(int index) {
 		std::string buffer = readBuffer(bytesRead, clientFd);
 		if (bytesRead > 0) {
 			Command	newCmd(buffer);
-			//std::cout << "received from client " << clientFd << ": " << buffer;
 		}
 		else if (bytesRead == 0) {
 			std::cout << "Client disconnected: " << clientFd << std::endl;
