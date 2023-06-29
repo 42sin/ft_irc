@@ -42,17 +42,37 @@ void	Server::removeDisconnectedClients(void) {
 	_disconnectedClients.clear();
 }
 
+std::string	Server::readBuffer(ssize_t& bytesRead, const int& clientFd) {
+	std::string	receivedData;
+	char buffer[2048];
+
+	do {
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+		if (bytesRead > 0) {
+			buffer[bytesRead] = '\0';
+			receivedData += buffer;
+		}
+		else if (bytesRead == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+			bytesRead = 1;
+	} while (bytesRead > 0 && receivedData.find("\r\n") == std::string::npos);
+	return receivedData;
+}
+
 void	Server::receive(int index) {
 	if (_pollFds[index].fd == _serverSocketFd) {
 		int clientFd = accept(_serverSocketFd, NULL, NULL);
-		_clients.push_back(clientFd);
-		std::cout << "New client connected: " << clientFd << std::endl;
+		if (clientFd == -1)
+			std::cerr << "Error acception connection: " << strerror(errno) << std::endl;
+		else {
+			_clients.push_back(clientFd);
+			std::cout << "New client connected: " << clientFd << std::endl;
+		}
 	}
 	else {
 		int clientFd = _pollFds[index].fd;
-		char buffer[1028];
-		memset(buffer, 0, sizeof(buffer));
-		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+		ssize_t bytesRead = 0;
+		std::string buffer = readBuffer(bytesRead, clientFd);
 		if (bytesRead > 0) {
 			Command	newCmd(buffer);
 			//std::cout << "received from client " << clientFd << ": " << buffer;

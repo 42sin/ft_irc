@@ -12,14 +12,14 @@ class Server {
 	std::vector<pollfd>	_pollFds;
 	std::vector<int>	_disconnectedClients;
 
-	void	initServer(void);
-	void	addSocketToPoll(int socketFd, short events);
-	bool	controlPolls(void);
-	void	closeConnection(int index);
-	void	receive(int index);
-	void	removeDisconnectedClients(void);
-	void	sendToSocket(int index);
-	void	sendMessage(std::string	msg, int fd);
+	void		initServer(void);
+	void		addSocketToPoll(int socketFd, short events);
+	bool		controlPolls(void);
+	void		closeConnection(int index);
+	void		receive(int index);
+	void		removeDisconnectedClients(void);
+	void		sendToSocket(int index);
+	std::string	readBuffer(ssize_t& bytesRead, const int& clientFd);
 public:
 	Server();
 	Server(const int port, const char* password);
