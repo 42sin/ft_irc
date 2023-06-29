@@ -5,6 +5,7 @@
 #include <exception>
 #include <vector>
 #include <iostream>
+#include "Responses.hpp"
 
 class Command {
 	std::string					_command;
