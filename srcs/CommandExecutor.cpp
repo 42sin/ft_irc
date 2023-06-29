@@ -1,6 +1,7 @@
 #include "../inc/Command.hpp"
 
 void	Command::executeCommand() {
+	
 	// if (_command == "PASS")
 	// 	return authenticate(this); // ?
 	// if (_command == "CAP")

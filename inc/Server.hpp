@@ -7,10 +7,10 @@ class Server {
 	const int			_port;
 	const char*			_password;
 	int					_serverSocketFd;
-	std::vector<int>	_clients;
 	std::vector<pollfd>	_pollFds;
-	std::vector<int>	_disconnectedClients;
 	std::queue<Command>	_commands;
+	std::vector<Client>	_clients;
+	std::vector<int>	_disconnectedClients;
 
 	void		initServer(void);
 	void		addSocketToPoll(int socketFd, short events);
@@ -20,6 +20,7 @@ class Server {
 	void		removeDisconnectedClients(void);
 	void		sendToSocket(int index);
 	std::string	readBuffer(ssize_t& bytesRead, const int& clientFd);
+	Client&		searchClientFd(int fd);
 public:
 	Server();
 	Server(const int port, const char* password);

@@ -38,14 +38,18 @@ void	Command::parseParameters(std::string& cmd) {
 		endPos = cmd.find(' ', startPos);
 		_params.push_back(cmd.substr(startPos, endPos - startPos));
 	}
-	if (endPos != std::string::npos)
-		cmd = cmd.substr(endPos + 1);
+	if (endPos != std::string::npos) {
+		if (cmd[endPos] == ':')
+			cmd = cmd.substr(endPos);
+		else
+			cmd = cmd.substr(endPos + 1);
+	}
 	else
 		cmd = "";
 }
 
 void	Command::parseTrailing(std::string &cmd) {
-	size_t colonPos = cmd.find(':', 0);
+	size_t colonPos = cmd.find_first_of(':', 0);
 	if (colonPos != std::string::npos) {
 		_trailing = cmd.substr(colonPos + 1);
 		cmd = cmd.substr(0, colonPos);
@@ -55,9 +59,6 @@ void	Command::parseTrailing(std::string &cmd) {
 }
 
 void	Command::parseCommand(std::string& cmd) {
-	if (cmd.size() <= 2 || cmd.substr(cmd.size() - 2) != "\r\n")
-		return ;
-	cmd.erase(cmd.size() - 2);
 	removePrefix(cmd);
 	parseCommandName(cmd);
 	std::replace(cmd.begin(), cmd.end(), '\n', ' ');

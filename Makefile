@@ -1,7 +1,7 @@
 NAME = ircserv
 FLAGS = -Wall -Wextra -Werror -std=c++98
-SRCS = main.cpp Server.cpp ServerUtils.cpp Command.cpp CommandUtils.cpp CommandParser.cpp CommandExecutor.cpp
-INCS = headers.hpp Server.hpp Command.hpp
+SRCS = main.cpp Server.cpp ServerUtils.cpp Command.cpp CommandUtils.cpp CommandParser.cpp CommandExecutor.cpp Responses.cpp
+INCS = headers.hpp Server.hpp Command.hpp Responses.hpp Client.hpp
 INC = $(patsubst %.hpp, ./inc/%.hpp, $(INCS))
 OBJ_PATH = ./objs/
 OBJS = $(patsubst %.cpp,$(OBJ_PATH)%.o,$(SRCS))

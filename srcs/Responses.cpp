@@ -209,7 +209,7 @@ std::string RPL_NAMREPLY(const std::string& nick, const std::string& channel_nam
 
 std::string RPL_ENDOFNAMES(const std::string& nick, const std::string& channel_name)
 {
-	std::cout << nick << " requested client-list of channel " << channel_name  << "!"<< RESET << "\n";
+	std::cout << nick << " requested client-list of channel " << channel_name  << "!" << "\n";
 	return std::string(":")  + "worst.chat" + " 366 " + nick + " " + channel_name + " :END of NAMES list\r\n";
 }
 

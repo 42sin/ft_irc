@@ -13,6 +13,7 @@ class Command {
 	std::string					_trailing;
 	int							_clientFd;
 	std::string					_buffer;
+	bool						_authenticated;
 
 	void	removePrefix(std::string&);
 	void	parseCommand(std::string&);
