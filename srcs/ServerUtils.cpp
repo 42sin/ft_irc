@@ -75,24 +75,23 @@ void	Server::receive(int index) {
 
 		ssize_t bytesRead = 0;
 		char	buffer[2048];
-		do {
-			memset(buffer, 0, sizeof(buffer));
-			bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-			if (bytesRead > 0)
-				currClient.buffer += std::string(buffer, bytesRead);
-		} while (bytesRead > 0);
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+		if (bytesRead > 0) { // still need to implement if buffer exceeds 512 characters -> message too long
+			currClient.buffer += std::string(buffer, bytesRead);
+			size_t pos = 0;
+			while ((pos = currClient.buffer.find("\r\n")) != std::string::npos) {
+				std::string	message = currClient.buffer.substr(0, pos);
+				_commands.push(Command(message, clientFd));
+				currClient.buffer = currClient.buffer.substr(pos + 2);
+			}
+		}
 		if (bytesRead == 0) {
 			std::cout << "Client disconnected: " << clientFd << std::endl;
 			_disconnectedClients.push_back(clientFd);
 		}
 		else if (bytesRead < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
 			std::cerr << "Error receiving data from client: " << strerror(errno) << std::endl;
-		}
-		size_t pos = 0;
-		while ((pos = currClient.buffer.find("\r\n")) != std::string::npos) {
-			std::string	message = currClient.buffer.substr(0, pos);
-			_commands.push(Command(message, clientFd));
-			currClient.buffer = currClient.buffer.substr(pos + 2);
 		}
 	}
 }
