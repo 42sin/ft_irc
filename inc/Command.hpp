@@ -6,6 +6,10 @@
 #include <vector>
 #include <iostream>
 
+enum vars {
+	AUTHENTICATED = FALSE
+}
+
 class Command {
 	std::string					_command;
 	std::vector<std::string>	_params;
@@ -22,6 +26,9 @@ public:
 	Command(std::string);
 	Command();
 	~Command();
+
+	bool checkPass(std::string input_pass);
+	void executePass();
 };
 
 #endif

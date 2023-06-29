@@ -74,3 +74,7 @@ void	Server::run(void) {
 	}
 	(void)_password;
 }
+
+bool Server::getPassword() {
+	return (_password);
+}
