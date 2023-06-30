@@ -7,6 +7,14 @@
 #include <iostream>
 #include "Responses.hpp"
 
+enum vars {
+	AUTHENTICATED,;
+}
+
+namespace vars- {
+	AUTHENTICATED = FALSE,
+}
+
 class Command {
 	std::string					_command;
 	std::vector<std::string>	_params;
@@ -28,6 +36,9 @@ public:
 	Command(std::string, int clientFd);
 	Command();
 	~Command();
+
+	bool checkPass(std::string input_pass);
+	std::string executePass();
 };
 
 #endif

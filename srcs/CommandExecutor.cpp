@@ -9,4 +9,9 @@ void	Command::executeCommand() {
 	// if (password != true) // ?
 	// 	return _buffer.append(ERR_NOTREGISTERED(_command));
 	// if abfragen auf commands, etc
+
+	if (_command == "PASS")
+		_buffer = executePASS();
+	else if (_command == "")
+
 }

@@ -26,6 +26,8 @@ public:
 	Server(const int port, const char* password);
 	~Server();
 
+	bool getPassword();
+
 	void	run(void);
 };
 
