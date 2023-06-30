@@ -38,7 +38,7 @@ std::string ERR_NOTREGISTERED(const std::string& command)
 
 std::string ERR_NOSUCHCHANNEL(const std::string& nick, const std::string& channel_name)
 {
-	std::cout << "User tried accessing channel " << channel_name << " but it did not exist" << "\n";
+	std::cout << "User tried accessing channel " << channel_name << "\n";
 	return std::string(":") + "worst.chat" + " 403 " +  nick + " " + channel_name + " : No such channel\r\n";
 }
 

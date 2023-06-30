@@ -4,13 +4,13 @@
 #include "headers.hpp"
 
 class Server {
-	const int			_port;
-	const char*			_password;
-	int					_serverSocketFd;
-	std::vector<pollfd>	_pollFds;
-	// std::queue<Command>	_commands;
-	std::vector<Client>	_clients;
-	std::vector<int>	_disconnectedClients;
+	const int				_port;
+	const char*				_password;
+	int						_serverSocketFd;
+	std::vector<pollfd>		_pollFds;
+	std::vector<Client>		_clients;
+	std::vector<int>		_disconnectedClients;
+	std::vector<Channel>	_channels;
 
 	void		initServer(void);
 	void		addSocketToPoll(int socketFd, short events);
@@ -21,12 +21,8 @@ class Server {
 	void		sendToSocket(int index);
 	Client&		searchClientFd(int fd);
 	void		executeCommand(Command& cmd, Client& client);
-public:
-	Server();
-	Server(const int port, const char* password);
-	~Server();
+	Channel*	searchChannelName(std::string name);
 
-	void	run(void);
 
 	// Commands
 	void	authenticate(Command& cmd, Client& client);
@@ -46,6 +42,12 @@ public:
 	void	leaveChannel(Command& cmd, Client& client);
 	void	leaveServer(Command& cmd, Client& client);
 
+public:
+	Server();
+	Server(const int port, const char* password);
+	~Server();
+
+	void	run(void);
 };
 
 #endif 

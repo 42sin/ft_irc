@@ -17,7 +17,7 @@ void	Server::setNick(Command& cmd, Client& client) {
 	if (cmd.params[0].find_first_of("[]\\/^#_`{|}!") != std::string::npos || cmd.params[0].size() < 3 || cmd.params[0].find_first_not_of(' ') == std::string::npos)
 		return cmd.setBuffer(ERR_ERRONEUSNICKNAME("User ", cmd.params[0]));
 	for (size_t i = 0; i < _clients.size(); i++) {
-		if (client.user.nick == cmd.params[0])
+		if (_clients[i].user.nick == cmd.params[0])
 			return cmd.setBuffer(ERR_NICKNAMEINUSE(cmd.params[0]));
 	}
 	if (client.getRegistered() == true) // maybe add broadcast to channels
@@ -41,6 +41,56 @@ void	Server::setUser(Command& cmd, Client& client) {
 	}
 }
 
+bool	validChannelName(std::string const& name) {
+	if (name.front() != '#')
+		return false;
+	if (name.find_first_of("\x00\x07\x0D\x0A") != std::string::npos)
+		return false;
+	if (name.size() < 2 || name.size() > 50)
+		return false;
+	return true;
+}
+
+Channel*	Server::searchChannelName(std::string name) {
+	for (size_t i = 0; i < _channels.size(); i++) {
+		if (_channels[i].getChName() == name)
+			return &_channels[i];
+	}
+	return NULL;
+}
+
+void	Server::joinChannel(Command& cmd, Client& client) {
+	if (cmd.params.size() == 0)
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
+	if (!validChannelName(cmd.params[0]))
+		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.user.nick, cmd.params[0]));
+	Channel*	channel = searchChannelName(cmd.params[0]);
+	if (channel == NULL) {
+		channel = new Channel(client, cmd.params[0]);
+		this->_channels.push_back(*channel);
+		channel->broadcast(RPL_JOIN(client.user.nick, client.user.username, cmd.params[0]));
+		if (!channel->getTopic().empty())
+			cmd.setBuffer(RPL_TOPIC(client.user.nick, cmd.params[0], channel->getTopic()));
+		delete channel;
+		return ;
+	}
+	else if (channel->getInviteMode() == true && channel->isInvited(client) == false)
+		return cmd.setBuffer(ERR_INVITEONLYCHAN(client.user.nick, channel->getChName()));
+	else {
+		if (channel->addToChannel(client) == true) {
+			channel->broadcast(RPL_JOIN(client.user.nick, client.user.username, cmd.params[0]));
+			if (!channel->getTopic().empty())
+				return cmd.setBuffer(RPL_TOPIC(client.user.nick, cmd.params[0], channel->getTopic()));
+		}
+	}
+}
+
+// void	Server::setMode(Command& cmd, Client& client) {
+// 	if (cmd.params.size() <= 1)
+// 		return cmd.setBuffer(ERR_NEEDMOREPARAMS("MODE"));
+	
+// }
+
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
 		return authenticate(cmd, client);
@@ -54,10 +104,10 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return setUser(cmd, client);
 	if (client.getRegistered() == false)
 		return cmd.setBuffer(ERR_NOTREGISTERED(cmd.getCmdName()));
-	// if (cmd == "JOIN")
-	// 	return joinChannel(cmd, client);
-	// if (cmd == "PING")
-	// 	return sendPing(cmd, client);
+	if (cmd == "JOIN")
+		return joinChannel(cmd, client);
+	if (cmd == "PING")
+		return cmd.setBuffer(RPL_PING(client.user.nick, cmd.getCmdName()));
 	// if (cmd == "MODE")
 	// 	return setMode(cmd, client);
 	// if (cmd == "PRIVMSG")
@@ -70,7 +120,7 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 	// 	return kickUser(cmd, client);
 	// if (cmd == "OPER")
 	// 	return makeAdmin(cmd, client);
-	// if (cmd == "EXIT")
+	// if (cmd == "PART")
 	// 	return leaveChannel(cmd, client);
 	// if (cmd == "QUIT")
 	// 	return leaveServer(cmd, client);

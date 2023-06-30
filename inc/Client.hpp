@@ -8,9 +8,10 @@ class Client {
 	int			_fd;
 	bool		_authenticated;
 	bool		_registered;
+	//bool		_admin;
 
 public:
-	
+
 	struct userData {
 		std::string			nick;
 		std::string 		username;
@@ -25,10 +26,9 @@ public:
 	std::string			buffer;
 	std::queue<Command>	commands;
 
-
 	void			setFd(int fd) { _fd = fd; }
-	void			setAuth() { _authenticated = 1; }
-	void			setRegistered() { _registered = 1; }
+	void			setAuth(void) { _authenticated = 1; }
+	void			setRegistered(void) { _registered = 1; }
 
 	int				getFd() const { return _fd; }
 	bool			getAuth() const { return _authenticated; }

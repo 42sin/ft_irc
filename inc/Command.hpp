@@ -26,6 +26,7 @@ public:
 	~Command();
 
 	void		setBuffer(std::string str) { _buffer = str; }
+	void		setClientFd(int fd) { _clientFd = fd; }
 
 	std::string	getBuffer(void) const { return _buffer; }
 	std::string	getCmdName(void) const { return _command; }

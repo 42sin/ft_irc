@@ -31,6 +31,12 @@ void	Server::closeConnection(int index) {
 }
 
 void	Server::removeDisconnectedClients(void) {
+	for (size_t i = 0; i < _channels.size(); i++) {
+		for (size_t j = 0; j < _clients.size(); j++) {
+			if (std::find(_disconnectedClients.begin(), _disconnectedClients.end(), _clients[j].getFd()) != _disconnectedClients.end())
+				_channels[i].removeFromChannel(_clients[j]);
+		}
+	}
 	for (size_t i = 0; i < _disconnectedClients.size(); i++) {
 		int clientFd = _disconnectedClients[i];
 		close(clientFd);
@@ -78,7 +84,7 @@ void	Server::receive(int index) {
 			std::cout << "Client disconnected: " << clientFd << std::endl;
 			_disconnectedClients.push_back(clientFd);
 		}
-		else if (bytesRead < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
+		else if (bytesRead < 0) {
 			std::cerr << "Error receiving data from client: " << strerror(errno) << std::endl;
 		}
 	}
