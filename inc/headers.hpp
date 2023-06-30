@@ -11,8 +11,9 @@
 #include <poll.h>
 #include <vector>
 #include <algorithm>
+#include <queue>
 #include "Command.hpp"
 #include "Client.hpp"
-#include <queue>
+#include "Responses.hpp"
 
 #endif

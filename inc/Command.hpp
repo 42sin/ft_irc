@@ -5,15 +5,12 @@
 #include <exception>
 #include <vector>
 #include <iostream>
-#include "Responses.hpp"
 
 class Command {
 	std::string					_command;
-	std::vector<std::string>	_params;
-	std::string					_trailing;
 	int							_clientFd;
+	std::string					_trailing;
 	std::string					_buffer;
-	bool						_authenticated;
 
 	void	removePrefix(std::string&);
 	void	parseCommand(std::string&);
@@ -21,13 +18,21 @@ class Command {
 	void	parseParameters(std::string&);
 	void	parseTrailing(std::string&);
 	void	printCmdInfo(void);
-	void	executeCommand(void);
 public:
-	std::string	getBuffer(void) const { return _buffer; };
-	int			getFd(void) const { return _clientFd; };
+	std::vector<std::string>	params;
+
 	Command(std::string, int clientFd);
 	Command();
 	~Command();
+
+	void		setBuffer(std::string str) { _buffer = str; }
+
+	std::string	getBuffer(void) const { return _buffer; }
+	std::string	getCmdName(void) const { return _command; }
+	std::string	getTrail(void) const { return _trailing; }
+	int			getFd(void) const { return _clientFd; }
+
+	bool		operator== (const std::string& name) const { return _command == name; }
 };
 
 #endif

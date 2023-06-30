@@ -42,23 +42,6 @@ void	Server::removeDisconnectedClients(void) {
 	_disconnectedClients.clear();
 }
 
-std::string	Server::readBuffer(ssize_t& bytesRead, const int& clientFd) {
-	std::string	receivedData;
-	char buffer[2048];
-
-	do {
-		memset(buffer, 0, sizeof(buffer));
-		bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-		if (bytesRead > 0) {
-			buffer[bytesRead] = '\0';
-			receivedData += buffer;
-		}
-		else if (bytesRead == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
-			bytesRead = 1;
-	} while (bytesRead > 0 && receivedData.find("\r\n") == std::string::npos);
-	return receivedData;
-}
-
 void	Server::receive(int index) {
 	if (_pollFds[index].fd == _serverSocketFd) {
 		int clientFd = accept(_serverSocketFd, NULL, NULL);
@@ -77,12 +60,17 @@ void	Server::receive(int index) {
 		char	buffer[2048];
 		memset(buffer, 0, sizeof(buffer));
 		bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-		if (bytesRead > 0) { // still need to implement if buffer exceeds 512 characters -> message too long
+		if (bytesRead > 0) {
 			currClient.buffer += std::string(buffer, bytesRead);
 			size_t pos = 0;
 			while ((pos = currClient.buffer.find("\r\n")) != std::string::npos) {
 				std::string	message = currClient.buffer.substr(0, pos);
-				_commands.push(Command(message, clientFd));
+				if (message.length() > 512)
+					std::cerr << "Error: Message exceeds max length" << std::endl;
+				else {
+					currClient.commands.push(Command(message, clientFd));
+					executeCommand(currClient.commands.back(), currClient);
+				}
 				currClient.buffer = currClient.buffer.substr(pos + 2);
 			}
 		}
@@ -98,12 +86,29 @@ void	Server::receive(int index) {
 
 void	Server::sendToSocket(int index) {
 	if (_pollFds[index].fd != _serverSocketFd) {
-		if (!_commands.empty()) {
-			Command	cmd = _commands.front();
-			_commands.pop();
+		Client& client = searchClientFd(_pollFds[index].fd);
+		if (!client.commands.empty()) {
+			Command cmd = client.commands.front();
 			if (!cmd.getBuffer().empty()) {
-				send(cmd.getFd(), cmd.getBuffer().data(), cmd.getBuffer().size(), 0);
+				if (send(cmd.getFd(), cmd.getBuffer().data(), cmd.getBuffer().size(), 0) >= 0) {
+					client.commands.pop();
+				}
 			}
+			else
+				client.commands.pop();
 		}
 	}
+
+
+	// if (_pollFds[index].fd != _serverSocketFd) {
+	// 	if (!_commands.empty()) {
+	// 		Command	cmd = _commands.front();
+	// 		if (cmd.getFd() == _pollFds[index].fd) {
+	// 			_commands.pop();
+	// 			if (!cmd.getBuffer().empty()) {
+	// 				send(cmd.getFd(), cmd.getBuffer().data(), cmd.getBuffer().size(), 0);
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

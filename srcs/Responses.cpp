@@ -15,7 +15,7 @@ std::string ERR_PASSWDMISMATCH()
 std::string ERR_ALREADYREGISTRED() 
 { 
 	std::cout << "User tried to re-authenticate!" << "\n";
-	return std::string(":") + "worst.chat" + " 462 " ":Already registered in\r\n";
+	return std::string(":") + "worst.chat" + " 462 " ":Already registered\r\n";
 }
 
 std::string ERR_NICKNAMEINUSE(const std::string& nick) 
@@ -56,7 +56,7 @@ std::string ERR_USERSDONTMATCH(const std::string& nick, const std::string& targe
 
 std::string ERR_UNKNOWNCOMMAND(const std::string& nick, const std::string& command)
 {
-	std::cout << nick << " tried executing unknown command: " << command << "!" << "\n";
+	std::cout << "User tried executing unknown command: " << command << "!" << "\n";
 	return std::string(":") + "worst.chat" + " 421 " + nick + " " + command + " :Unknown command\r\n";
 }
 
