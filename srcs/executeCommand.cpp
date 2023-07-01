@@ -85,11 +85,27 @@ void	Server::joinChannel(Command& cmd, Client& client) {
 	}
 }
 
-// void	Server::setMode(Command& cmd, Client& client) {
-// 	if (cmd.params.size() <= 1)
-// 		return cmd.setBuffer(ERR_NEEDMOREPARAMS("MODE"));
-	
-// }
+void	executeTopic(Command &cmd, Client &client)
+{
+	Channel ch = Server::getChanel(cmd.argument[0]);
+	if (cmd.armunets.size() == 0)
+		return ERR_NEEDMOREPARAMS(cmd.getCommand());
+	else if (cmd.arguments.size() == 1) {
+		if (ch == NULL)
+			return (ERR_NOSUCHCHANNEL(client.GetNick(), ch.getChName()));
+		else {
+			if (ch.topic.empty())
+				return (RPL_NOTOPIC(client.GetNick(), ch.GetChName()));
+			else 
+				return (RPL_TOPIC(client.GetNick(), ch.getChName(), ch.getTopic()));
+		}
+	}
+	else if (cmd.argument.size() == 2){
+		ch.setTopic(cmd.arguments.operator[1]);
+		return RPL_TOPICCHANGE(client.GetNick(), client.user.username, ch.getChName(), ch.getTopic());
+	}
+}
+
 
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
@@ -108,14 +124,15 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return joinChannel(cmd, client);
 	if (cmd == "PING")
 		return cmd.setBuffer(RPL_PING(client.user.nick, cmd.getCmdName()));
+	if (cmd == "TOPIC")
+		return executeTopic(cmd, client);
 	// if (cmd == "MODE")
 	// 	return setMode(cmd, client);
 	// if (cmd == "PRIVMSG")
 	// 	return sendMessage(cmd, client);
 	// if (cmd == "INVITE")
 	// 	return sendInvite(cmd, client);
-	// if (cmd == "TOPIC")
-	// 	return setTopic(cmd, client);
+
 	// if (cmd == "KICK")
 	// 	return kickUser(cmd, client);
 	// if (cmd == "OPER")

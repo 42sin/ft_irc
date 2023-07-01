@@ -10,12 +10,14 @@ class Client {
 	bool		_registered;
 	//bool		_admin;
 
+
 public:
 
 	struct userData {
 		std::string			nick;
 		std::string 		username;
 		std::vector<int>	channels;
+
 		userData() : nick(""), username("") {}
 	} user;
 
@@ -34,6 +36,7 @@ public:
 	bool			getAuth() const { return _authenticated; }
 	bool			getRegistered() const { return _registered; }
 	std::string&	getBuffer() { return buffer; }
+	std::string		getNick() {return _nick;}
 
 	bool			operator== (const int& fd) const { return _fd == fd; }
 };

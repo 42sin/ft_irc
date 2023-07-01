@@ -42,6 +42,8 @@ class Server {
 	void	leaveChannel(Command& cmd, Client& client);
 	void	leaveServer(Command& cmd, Client& client);
 
+	Channel getChanel();
+
 public:
 	Server();
 	Server(const int port, const char* password);

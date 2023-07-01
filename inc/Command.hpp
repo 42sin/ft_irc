@@ -34,11 +34,13 @@ public:
 	std::string executePass();
 	void		setBuffer(std::string str) { _buffer = str; }
 	void		setClientFd(int fd) { _clientFd = fd; }
+	void		executeTopic();
 
 	std::string	getBuffer(void) const { return _buffer; }
 	std::string	getCmdName(void) const { return _command; }
 	std::string	getTrail(void) const { return _trailing; }
 	int			getFd(void) const { return _clientFd; }
+	std::string getCommand(void) const {return _command; }
 
 	bool		operator== (const std::string& name) const { return _command == name; }
 };

@@ -85,3 +85,11 @@ void	Server::run(void) {
 bool Server::getPassword() {
 	return (_password);
 }
+
+Chanel Server::getChanel(std::string chanel) {
+	for (std::Channel::iterator it = _channels.begin(); it != _channels.end(); it++) {
+		if (*it == chanel)
+			return it;
+	}
+	return NULL;
+}
