@@ -29,8 +29,8 @@ class Server {
 
 	void		setNick(Command& cmd, Client& client);
 	void		setUser(Command& cmd, Client& client);
-	void		setMode(Command& cmd, Client& client, Channel* ch);
-	std::string	parseMode(std::vector<std::string>const& mode, Client& client);
+	void		setMode(Command& cmd, Client& client);
+	std::string	parseMode(std::vector<std::string>const& mode, Client& client, Channel* ch);
 
 	void		sendPing(Command& cmd, Client& client);
 	void		sendMessage(Command& cmd, Client& client);

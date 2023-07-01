@@ -86,7 +86,7 @@ std::string ERR_NOPRIVS(const std::string& nick, const std::string& command)
 
 std::string ERR_UMODEUNKNOWNFLAG(const std::string& nick)
 {
-	std::cout << nick << "used invalid mode flags" << "\n";
+	std::cout << nick << " used invalid mode flags" << "\n";
 	return std::string(":") + "worst.chat" + " 501 " + nick + " :Unknown MODE flags\r\n";
 }
 
@@ -111,7 +111,18 @@ std::string ERR_NOTONCHANNEL(const std::string nick, const std::string channel_n
 std::string ERR_INVITEONLYCHAN(const std::string& nick, const std::string& channel_name)
 {
 	std::cout << nick << " tried joining " << channel_name << " but he was not invited!" << "\n";
-	return std::string(":") + "worst.chat" + " 473 " + nick + " " + channel_name + " : Cannot join channel (+i) - you must be invited\r\n";
+	return std::string(":") + "worst.chat" + " 473 " + nick + " " + channel_name + " :Cannot join channel (+i) - you must be invited\r\n";
+}
+
+std::string	ERR_BADCHANNELKEY(const std::string &nick, const std::string &channel_name)
+{
+	std::cout << nick << " tried joining " << channel_name << " but provided the wrong key!" << "\n";
+	return std::string(":") + "worst.chat" + " 475 " + nick + " " + channel_name + " :Cannot join channel (+k) - bad key\r\n";
+}
+
+std::string	ERR_CHANNELISFULL(const std::string &nick, const std::string &channel_name) {
+	std::cout << nick << " tried joining " << channel_name << " but the channel is already full!" << "\n";
+	return std::string(":") + "worst.chat" + " 471 " + nick + " " + channel_name + " :Cannot join channel (+l) - channel is full\r\n";
 }
 
 std::string RPL_NICKCHANGE(const std::string& old_nick, const std::string& new_nick, const std::string& user) 
@@ -221,13 +232,13 @@ std::string RPL_MODEUSER(const std::string& nick, const std::string& mode)
 
 std::string RPL_CHANNELMODEIS(const std::string& nick, const std::string& channel_name, const std::string& mode)
 {
-	std::cout << nick << "requested " << channel_name << "'s mode: " << mode << "\n";
+	std::cout << nick << " requested " << channel_name << "'s mode: " << mode << "\n";
 	return std::string(":") + "worst.chat" + " 324 " + nick + " " + channel_name + " " + mode + "\r\n";
 }
 
 std::string RPL_SETMODECHANNEL(const std::string& nick, const std::string& channel_name, const std::string& mode)
 {
-	std::cout << nick << "set " << channel_name << "'s mode to " << mode << "!" << "\n";
+	std::cout << nick << " set " << channel_name << "'s mode to " << mode << "!" << "\n";
 	return std::string(":") + "worst.chat" + " 324 " + nick + " " + channel_name + " " + mode + "\r\n";
 }
 

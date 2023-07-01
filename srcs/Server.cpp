@@ -81,7 +81,3 @@ void	Server::run(void) {
 		removeDisconnectedClients();
 	}
 }
-
-bool Server::getPassword() {
-	return (_password);
-}

@@ -24,6 +24,8 @@ std::string ERR_USERONCHANNEL(const std::string &nick, const std::string &channe
 std::string ERR_USERNOTINCHANNEL(const std::string &nick, const std::string &channel_name);
 std::string ERR_NOTONCHANNEL(const std::string nick, const std::string channel_name);
 std::string ERR_INVITEONLYCHAN(const std::string &nick, const std::string &channel_name);
+std::string	ERR_BADCHANNELKEY(const std::string &nick, const std::string &channel_name);
+std::string	ERR_CHANNELISFULL(const std::string &nick, const std::string &channel_name);
 
 std::string RPL_NICKCHANGE(const std::string &old_nick, const std::string &new_nick, const std::string &user);
 std::string RPL_CAP();

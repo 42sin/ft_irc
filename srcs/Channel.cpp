@@ -1,7 +1,7 @@
 #include "../inc/Channel.hpp"
 
 
-Client*		Channel::searchClientByNick(std::string& nick) {
+Client*		Channel::searchClientByNick(std::string const& nick) {
 	for (size_t i = 0; i < _connectedClients.size(); i++) {
 		if (_connectedClients[i]->getNick() == nick)
 			return _connectedClients[i];
@@ -60,16 +60,17 @@ Channel::Channel(Client& client, std::string channelName) : _topicMode(1), _mode
 
 bool	Channel::addToChannel(Client& client) {
 	for (size_t i = 0; i < _connectedClients.size(); i++) {
-		std::cout << "Connected client: " << _connectedClients[i]->getFd() << std::endl;
 		if (_connectedClients[i] == &client)
 			return false;
 	}
-	std::cout << "pushing client on connectedClients" << std::endl;
 	_connectedClients.push_back(&client);
 	return true;
 }
 
 void	Channel::removeFromChannel(Client& client) {
+	if (isChannelOperator(client.getNick())) {
+		removeOperator(client.getNick());
+	}
 	for (size_t i = 0; i < _connectedClients.size(); i++) {
 		if (_connectedClients[i] == &client) {
 			_connectedClients.erase(_connectedClients.begin() + i);

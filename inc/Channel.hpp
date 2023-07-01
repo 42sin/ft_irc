@@ -32,11 +32,14 @@ public:
 	bool		getUserLimitMode(void) const { return _userLimitMode; }
 	std::string	getTopic(void) const { return _topic; }
 	std::string	getModeStr(void) const { return _modes; }
+	std::string	getPassword(void) const { return _password; }
+	size_t		getAmountUsers(void) const { return _connectedClients.size(); }
+	int			getUserlimit(void) const { return _userLimit; }
 
-	void		setInviteOnly(void) { _inviteOnlyMode == false ? _inviteOnlyMode = true : _inviteOnlyMode = false; }
-	void		setTopicRestrictions(void) { _topicMode == false ? _topicMode = true : _topicMode = false; }
-	void		setPasswordMode(void) { _channelKeyMode == false ? _channelKeyMode = true : _channelKeyMode = false; }
-	void		setUserLimitMode(void) { _userLimitMode == false ? _userLimitMode = true : _userLimitMode = false; }
+	void		setInviteOnly(bool b) { _inviteOnlyMode = b; }
+	void		setTopicRestrictions(bool b) { _topicMode = b; }
+	void		setPasswordMode(bool b) { _channelKeyMode = b; }
+	void		setUserLimitMode(bool b) { _userLimitMode = b; }
 	void		setUserLimit(int userLimit) { _userLimit = userLimit; }
 	void		setPassword(std::string const& password) { _password = password; }
 
@@ -50,7 +53,7 @@ public:
 
 	bool		addToChannel(Client& client);
 	Client*		searchClient(Client& client);
-	Client*		searchClientByNick(std::string& nick);
+	Client*		searchClientByNick(std::string const& nick);
 	void		removeFromChannel(Client& client);
 };
 
