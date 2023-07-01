@@ -3,14 +3,6 @@
 #include <vector>
 #include <iostream>
 
-enum vars {
-	AUTHENTICATED,;
-}
-
-namespace vars- {
-	AUTHENTICATED = FALSE,
-}
-
 class Command {
 	std::string					_command;
 	int							_clientFd;

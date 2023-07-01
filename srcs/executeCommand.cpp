@@ -17,7 +17,7 @@ void	Server::setNick(Command& cmd, Client& client) {
 	if (cmd.params[0].find_first_of("[]\\/^#_`{|}!") != std::string::npos || cmd.params[0].size() < 3 || cmd.params[0].find_first_not_of(' ') == std::string::npos)
 		return cmd.setBuffer(ERR_ERRONEUSNICKNAME("User ", cmd.params[0]));
 	for (size_t i = 0; i < _clients.size(); i++) {
-		if (_clients[i].user.nick == cmd.params[0])
+		if (_clients[i]->user.nick == cmd.params[0])
 			return cmd.setBuffer(ERR_NICKNAMEINUSE(cmd.params[0]));
 	}
 	if (client.getRegistered() == true) // maybe add broadcast to channels
@@ -53,8 +53,8 @@ bool	validChannelName(std::string const& name) {
 
 Channel*	Server::searchChannelName(std::string name) {
 	for (size_t i = 0; i < _channels.size(); i++) {
-		if (_channels[i].getChName() == name)
-			return &_channels[i];
+		if (_channels[i]->getChName() == name)
+			return _channels[i];
 	}
 	return NULL;
 }
@@ -67,11 +67,10 @@ void	Server::joinChannel(Command& cmd, Client& client) {
 	Channel*	channel = searchChannelName(cmd.params[0]);
 	if (channel == NULL) {
 		channel = new Channel(client, cmd.params[0]);
-		this->_channels.push_back(*channel);
+		this->_channels.push_back(channel);
 		channel->broadcast(RPL_JOIN(client.user.nick, client.user.username, cmd.params[0]));
 		if (!channel->getTopic().empty())
 			cmd.setBuffer(RPL_TOPIC(client.user.nick, cmd.params[0], channel->getTopic()));
-		delete channel;
 		return ;
 	}
 	else if (channel->getInviteMode() == true && channel->isInvited(client) == false)

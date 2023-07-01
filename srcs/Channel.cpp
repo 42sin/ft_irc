@@ -33,9 +33,11 @@ Channel::Channel(Client& client, std::string channelName) {
 
 bool	Channel::addToChannel(Client& client) {
 	for (size_t i = 0; i < _connectedClients.size(); i++) {
+		std::cout << "Connected client: " << _connectedClients[i]->getFd() << std::endl;
 		if (_connectedClients[i] == &client)
 			return false;
 	}
+	std::cout << "pushing client on connectedClients" << std::endl;
 	_connectedClients.push_back(&client);
 	return true;
 }

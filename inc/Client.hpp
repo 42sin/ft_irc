@@ -2,6 +2,7 @@
 #define CLIENT_HPP
 
 #include <queue>
+#include <unistd.h>
 #include "Command.hpp"
 
 class Client {
@@ -21,6 +22,7 @@ public:
 		userData() : nick(""), username("") {}
 	} user;
 
+	~Client() { if (_fd != -1) close(_fd); _fd = -1; }
 	Client() : _fd(-2), _authenticated(0), user() {}
 	Client(int fd) : _fd(fd), _authenticated(0), user() {}
 
