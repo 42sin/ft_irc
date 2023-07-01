@@ -253,7 +253,7 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 			return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
 		Command newMessage;
 		newMessage.setClientFd(receiver->getFd());
-		newMessage.setBuffer(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + "PRIVMSG " + receiver->getNick() + " :" + cmd.getTrail() + "\r\n"));
+		newMessage.setBuffer(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + cmd.getCmdName() + " " + receiver->getNick() + " :" + cmd.getTrail() + "\r\n"));
 		receiver->commands.push(newMessage);
 	}
 	else {
@@ -262,7 +262,7 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 			return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
 		if (ch->searchClient(client) == NULL)
 			return cmd.setBuffer(ERR_CANNOTSENDTOCHAN(client.getNick(), cmd.params[0]));
-		ch->broadcast(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + "PRIVMSG " + ch->getChName() + " :" + cmd.getTrail() + "\r\n"));
+		ch->broadcast(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + cmd.getCmdName() + " " + ch->getChName() + " :" + cmd.getTrail() + "\r\n"));
 	}
 }
 
@@ -306,7 +306,7 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return setMode(cmd, client);
 	if (cmd == "PART")
 		return leaveChannel(cmd, client);
-	if (cmd == "PRIVMSG")
+	if (cmd == "PRIVMSG" || cmd == "NOTICE")
 		return sendMessage(cmd, client);
 	if (cmd == "INVITE")
 		return sendInvite(cmd, client);
