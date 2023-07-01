@@ -122,6 +122,20 @@ void	Server::kickUser(Command &cmd, Client &client) {
 	ch->removeFromChannel(*ClientToKick);
 }
 
+void Server::sendInvite(Command &cmd, Client &client) {
+	if (cmd.params.size() < 2)
+	return (cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand())))
+	Channel* ch = searchChannelName(cmd.params[1]);
+	if (ch == NULL)
+		return (ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[1]));
+	if (client.isChannelOperator() == FALSE)
+		return (ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[1]));
+	std::vector<std::string> it = std::find(ch->connectedClients.begin(), ch->connectedClients.end(), cmd->params[0])
+	if (it == ch->connectedClients.end())
+		return (ERR_NOTONCHANNEL(client.getNick(), ch->getChName()));
+	ch->_invitedClients.push_back(cmd.params[0])
+	return (SPL_INVITED);
+}
 
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
@@ -146,8 +160,8 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 	// 	return setMode(cmd, client);
 	// if (cmd == "PRIVMSG")
 	// 	return sendMessage(cmd, client);
-	// if (cmd == "INVITE")
-	// 	return sendInvite(cmd, client);
+	if (cmd == "INVITE")
+		return sendInvite(cmd, client);
 	if (cmd == "KICK")
 		return kickUser(cmd, client);
 	// if (cmd == "OPER")
