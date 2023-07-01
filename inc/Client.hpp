@@ -1,0 +1,42 @@
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
+
+#include <queue>
+#include "Command.hpp"
+
+class Client {
+	int			_fd;
+	bool		_authenticated;
+	bool		_registered;
+	//bool		_admin;
+
+public:
+
+	struct userData {
+		std::string			nick;
+		std::string 		username;
+		std::vector<int>	channels;
+		userData() : nick(""), username("") {}
+	} user;
+
+	Client() : _fd(-2), _authenticated(0), user() {}
+	Client(int fd) : _fd(fd), _authenticated(0), user() {}
+
+
+	std::string			buffer;
+	std::queue<Command>	commands;
+
+	void			setFd(int fd) { _fd = fd; }
+	void			setAuth(void) { _authenticated = 1; }
+	void			setRegistered(void) { _registered = 1; }
+
+	int				getFd() const { return _fd; }
+	bool			getAuth() const { return _authenticated; }
+	bool			getRegistered() const { return _registered; }
+	std::string&	getBuffer() { return buffer; }
+
+	bool			operator== (const int& fd) const { return _fd == fd; }
+};
+
+
+#endif

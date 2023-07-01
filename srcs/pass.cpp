@@ -11,9 +11,6 @@ std::string Command::executePass()
         AUTHENTICATED = FASE;
         return (ERR_NOTREGISTERED());
     }
-    
-    
-
 }
 
 bool Command::checkPass(std::string input_pass)

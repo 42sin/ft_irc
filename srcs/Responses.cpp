@@ -15,7 +15,7 @@ std::string ERR_PASSWDMISMATCH()
 std::string ERR_ALREADYREGISTRED() 
 { 
 	std::cout << "User tried to re-authenticate!" << "\n";
-	return std::string(":") + "worst.chat" + " 462 " ":Already registered in\r\n";
+	return std::string(":") + "worst.chat" + " 462 " ":Already registered\r\n";
 }
 
 std::string ERR_NICKNAMEINUSE(const std::string& nick) 
@@ -38,7 +38,7 @@ std::string ERR_NOTREGISTERED(const std::string& command)
 
 std::string ERR_NOSUCHCHANNEL(const std::string& nick, const std::string& channel_name)
 {
-	std::cout << "User tried accessing channel " << channel_name << " but it did not exist" << "\n";
+	std::cout << "User tried accessing channel " << channel_name << "\n";
 	return std::string(":") + "worst.chat" + " 403 " +  nick + " " + channel_name + " : No such channel\r\n";
 }
 
@@ -56,7 +56,7 @@ std::string ERR_USERSDONTMATCH(const std::string& nick, const std::string& targe
 
 std::string ERR_UNKNOWNCOMMAND(const std::string& nick, const std::string& command)
 {
-	std::cout << nick << " tried executing unknown command: " << command << "!" << "\n";
+	std::cout << "User tried executing unknown command: " << command << "!" << "\n";
 	return std::string(":") + "worst.chat" + " 421 " + nick + " " + command + " :Unknown command\r\n";
 }
 
@@ -209,7 +209,7 @@ std::string RPL_NAMREPLY(const std::string& nick, const std::string& channel_nam
 
 std::string RPL_ENDOFNAMES(const std::string& nick, const std::string& channel_name)
 {
-	std::cout << nick << " requested client-list of channel " << channel_name  << "!"<< RESET << "\n";
+	std::cout << nick << " requested client-list of channel " << channel_name  << "!" << "\n";
 	return std::string(":")  + "worst.chat" + " 366 " + nick + " " + channel_name + " :END of NAMES list\r\n";
 }
 

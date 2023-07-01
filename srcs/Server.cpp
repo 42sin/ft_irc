@@ -13,16 +13,24 @@ Server::Server() :_port(0), _password(NULL), _serverSocketFd(0), _clients(0, 0) 
 Server::~Server() {
 	std::cout << std::endl;
 	for (size_t i = 0; i < _clients.size(); i++) {
-		std::cout << "Closing client fd: " << _clients[i] << std::endl;
-		if (_clients[i] > 0) {
-			close(_clients[i]);
-			_clients[i] = -1;
+		std::cout << "Closing client fd: " << _clients[i].getFd() << std::endl;
+		if (_clients[i].getFd() > 0) {
+			close(_clients[i].getFd());
+			_clients[i].setFd(-1);
 		}
 	}
 	close(_serverSocketFd);
 }
 
-Server::Server(const int port, const char* password) : _port(port), _password(password), _clients(0, 0){
+Client&	Server::searchClientFd(int fd) {
+	for (size_t i = 0; i < _clients.size(); i++) {
+		if (_clients[i] == fd)
+			return _clients[i];
+	}
+	throw std::runtime_error("Client not found");
+}
+
+Server::Server(const int port, const char* password) : _port(port), _password(password), _clients(0, 0) {
 	_serverSocketFd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_serverSocketFd < 0) {
 		throw std::runtime_error("Error creating socket");
@@ -72,7 +80,6 @@ void	Server::run(void) {
 		}
 		removeDisconnectedClients();
 	}
-	(void)_password;
 }
 
 bool Server::getPassword() {

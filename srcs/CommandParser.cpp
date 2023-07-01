@@ -23,8 +23,7 @@ void	Command::parseCommandName(std::string &cmd) {
 }
 
 void	Command::parseParameters(std::string& cmd) {
-	if (cmd.empty()) {
-		_params.push_back("");
+	if (cmd.empty()) { // removed params.push_back("") because it is not needes as params.size() equals 0 then otherwise it will be 1
 		return ;
 	}
 	size_t startPos = 0;
@@ -36,16 +35,20 @@ void	Command::parseParameters(std::string& cmd) {
 		if (cmd[startPos] == ':')
 			break ;
 		endPos = cmd.find(' ', startPos);
-		_params.push_back(cmd.substr(startPos, endPos - startPos));
+		params.push_back(cmd.substr(startPos, endPos - startPos));
 	}
-	if (endPos != std::string::npos)
-		cmd = cmd.substr(endPos + 1);
+	if (endPos != std::string::npos) {
+		if (cmd[endPos] == ':')
+			cmd = cmd.substr(endPos);
+		else
+			cmd = cmd.substr(endPos + 1);
+	}
 	else
 		cmd = "";
 }
 
 void	Command::parseTrailing(std::string &cmd) {
-	size_t colonPos = cmd.find(':', 0);
+	size_t colonPos = cmd.find_first_of(':', 0);
 	if (colonPos != std::string::npos) {
 		_trailing = cmd.substr(colonPos + 1);
 		cmd = cmd.substr(0, colonPos);
@@ -55,9 +58,8 @@ void	Command::parseTrailing(std::string &cmd) {
 }
 
 void	Command::parseCommand(std::string& cmd) {
-	if (cmd.size() <= 2 || cmd.substr(cmd.size() - 2) != "\r\n")
-		return ;
-	cmd.erase(cmd.size() - 2);
+	if (cmd.size() > 512)
+		throw std::runtime_error("Message too long");
 	removePrefix(cmd);
 	parseCommandName(cmd);
 	std::replace(cmd.begin(), cmd.end(), '\n', ' ');

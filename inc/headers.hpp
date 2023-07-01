@@ -11,8 +11,10 @@
 #include <poll.h>
 #include <vector>
 #include <algorithm>
-#include "Buffer.hpp"
-#include "Command.hpp"
 #include <queue>
+#include "Command.hpp"
+#include "Client.hpp"
+#include "Responses.hpp"
+#include "Channel.hpp"
 
 #endif
