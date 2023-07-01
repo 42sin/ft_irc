@@ -11,7 +11,7 @@ bool	Server::controlPolls(void) {
 	_pollFds.clear();
 	addSocketToPoll(_serverSocketFd, POLLIN);
 	for (size_t i = 0; i < _clients.size(); i++) {
-		addSocketToPoll(_clients[i].getFd(), POLLIN | POLLOUT);
+		addSocketToPoll(_clients[i]->getFd(), POLLIN | POLLOUT);
 	}
 	if (poll(&_pollFds[0], _pollFds.size(), -1) == -1) {
 		if (errno == EINTR) {
@@ -33,18 +33,21 @@ void	Server::closeConnection(int index) {
 void	Server::removeDisconnectedClients(void) {
 	for (size_t i = 0; i < _channels.size(); i++) {
 		for (size_t j = 0; j < _clients.size(); j++) {
-			if (std::find(_disconnectedClients.begin(), _disconnectedClients.end(), _clients[j].getFd()) != _disconnectedClients.end())
-				_channels[i].removeFromChannel(_clients[j]);
+			if (std::find(_disconnectedClients.begin(), _disconnectedClients.end(), _clients[j]->getFd()) != _disconnectedClients.end())
+				_channels[i]->removeFromChannel(*_clients[j]);
 		}
 	}
 	for (size_t i = 0; i < _disconnectedClients.size(); i++) {
 		int clientFd = _disconnectedClients[i];
-		close(clientFd);
-		std::vector<Client>::iterator it = std::find(_clients.begin(), _clients.end(), clientFd);
-        if (it != _clients.end()) {
-            _clients.erase(std::remove(_clients.begin(), _clients.end(), clientFd), _clients.end());
-        }
-	}
+		std::vector<Client*>::iterator it = _clients.begin();
+        for (; it != _clients.end(); ++it)
+			if ((*it)->getFd() == clientFd)
+				break ;
+		if (it != _clients.end()) {
+			delete *it;
+			_clients.erase(it);
+		}
+    }
 	_disconnectedClients.clear();
 }
 
@@ -54,30 +57,33 @@ void	Server::receive(int index) {
 		if (clientFd == -1)
 			std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
 		else {
-			_clients.push_back(Client(clientFd));
+			_clients.push_back(new Client(clientFd));
 			std::cout << "New client connected: " << clientFd << std::endl;
 		}
 	}
 	else {
 		int clientFd = _pollFds[index].fd;
-		Client& currClient = searchClientFd(clientFd);
-
+		Client* currClient = searchClientFd(clientFd);
+		if (currClient == NULL) {
+			std::cerr << "Critical error: Client not found" << std::endl;
+			return ;
+		}
 		ssize_t bytesRead = 0;
 		char	buffer[2048];
 		memset(buffer, 0, sizeof(buffer));
 		bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 		if (bytesRead > 0) {
-			currClient.buffer += std::string(buffer, bytesRead);
+			currClient->buffer += std::string(buffer, bytesRead);
 			size_t pos = 0;
-			while ((pos = currClient.buffer.find("\r\n")) != std::string::npos) {
-				std::string	message = currClient.buffer.substr(0, pos);
+			while ((pos = currClient->buffer.find("\r\n")) != std::string::npos) {
+				std::string	message = currClient->buffer.substr(0, pos);
 				if (message.length() > 512)
 					std::cerr << "Error: Message exceeds max length" << std::endl;
 				else {
-					currClient.commands.push(Command(message, clientFd));
-					executeCommand(currClient.commands.back(), currClient);
+					currClient->commands.push(Command(message, clientFd));
+					executeCommand(currClient->commands.back(), *currClient);
 				}
-				currClient.buffer = currClient.buffer.substr(pos + 2);
+				currClient->buffer = currClient->buffer.substr(pos + 2);
 			}
 		}
 		if (bytesRead == 0) {
@@ -92,16 +98,20 @@ void	Server::receive(int index) {
 
 void	Server::sendToSocket(int index) {
 	if (_pollFds[index].fd != _serverSocketFd) {
-		Client& client = searchClientFd(_pollFds[index].fd);
-		if (!client.commands.empty()) {
-			Command cmd = client.commands.front();
+		Client* client = searchClientFd(_pollFds[index].fd);
+		if (client == NULL) {
+			std::cerr << "Critical error: client not found" << std::endl;
+			return ;
+		}
+		if (!client->commands.empty()) {
+			Command cmd = client->commands.front();
 			if (!cmd.getBuffer().empty()) {
 				if (send(cmd.getFd(), cmd.getBuffer().data(), cmd.getBuffer().size(), 0) >= 0) {
-					client.commands.pop();
+					client->commands.pop();
 				}
 			}
 			else
-				client.commands.pop();
+				client->commands.pop();
 		}
 	}
 

@@ -8,9 +8,9 @@ class Server {
 	const char*				_password;
 	int						_serverSocketFd;
 	std::vector<pollfd>		_pollFds;
-	std::vector<Client>		_clients;
+	std::vector<Client*>	_clients;
 	std::vector<int>		_disconnectedClients;
-	std::vector<Channel>	_channels;
+	std::vector<Channel*>	_channels;
 
 	void		initServer(void);
 	void		addSocketToPoll(int socketFd, short events);
@@ -19,7 +19,7 @@ class Server {
 	void		receive(int index);
 	void		removeDisconnectedClients(void);
 	void		sendToSocket(int index);
-	Client&		searchClientFd(int fd);
+	Client*		searchClientFd(int fd);
 	void		executeCommand(Command& cmd, Client& client);
 	Channel*	searchChannelName(std::string name);
 
