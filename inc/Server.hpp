@@ -42,7 +42,7 @@ class Server {
 	void	leaveChannel(Command& cmd, Client& client);
 	void	leaveServer(Command& cmd, Client& client);
 
-	Channel getChanel();
+	Channel getChanel(std::string chanel);
 
 public:
 	Server();

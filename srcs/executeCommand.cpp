@@ -85,24 +85,39 @@ void	Server::joinChannel(Command& cmd, Client& client) {
 	}
 }
 
-void	executeTopic(Command &cmd, Client &client)
+void	Command::executeTopic(Command &cmd, Client &client)
 {
-	Channel ch = Server::getChanel(cmd.argument[0]);
-	if (cmd.armunets.size() == 0)
+	Channel* ch = Server::getChannel(cmd.argument[0]);
+	if (cmd.arguments.size() == 0)
 		return ERR_NEEDMOREPARAMS(cmd.getCommand());
 	else if (cmd.arguments.size() == 1) {
 		if (ch == NULL)
-			return (ERR_NOSUCHCHANNEL(client.GetNick(), ch.getChName()));
+			return (ERR_NOSUCHCHANNEL(client.GetNick(), cmd.arguments[0]));
 		else {
-			if (ch.topic.empty())
+			if (ch._chanel.empty())
 				return (RPL_NOTOPIC(client.GetNick(), ch.GetChName()));
 			else 
 				return (RPL_TOPIC(client.GetNick(), ch.getChName(), ch.getTopic()));
 		}
 	}
 	else if (cmd.argument.size() == 2){
-		ch.setTopic(cmd.arguments.operator[1]);
+		ch.setTopic(cmd.arguments[1]);
 		return RPL_TOPICCHANGE(client.GetNick(), client.user.username, ch.getChName(), ch.getTopic());
+	}
+}
+
+void	Command::executeKick(Command &cmd, Client &client) {
+	if (cmd.arguments.size() <= 1)
+		return (ERR_NEEDMOREPARAMS(cmd.getCommand()));
+	else if (Channel ch = Server::getChanel(cmd.arguments[0]) == NULL)
+		return (ERR_NOSUCHCHANNEL(client.getNick()), cmd.arguments[0]);
+	else if (ch.isChannelOperator(clinent.user->_nick) == false)
+		return (ERR_CHANOPRIVSNEEDED(client.user->nick));
+	std::vector<char>iterator it = std::find(ch.begin(), ch.end(), cmd.argument[1]);
+	if (it != ch.end())
+	{
+		ch.erase(it);
+		return (RPL_KICK(client.user->nick, client.user->user, ch.getChName(), "please contact your channel operator!"));
 	}
 }
 
