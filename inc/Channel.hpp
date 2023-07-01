@@ -13,7 +13,7 @@ class Channel {
 	std::string					_name;
 	std::string					_topic;
 	std::string					_modes;
-	std::vector<Client*>		_invitedClients;
+	std::vector<std::string>	_invitedClients;
 	std::vector<Client*>		_connectedClients;
 	std::vector<std::string>	_channelOperators;
 	int							_userLimit;
@@ -48,8 +48,11 @@ public:
 	bool		isInvited(Client& client);
 	bool		isChannelOperator(std::string const& nick);
 
+	void		addToInvites(std::string const& nick);
 	void		addToOperators(std::string const& nick);
 	void		removeOperator(std::string const& nick);
+	void		removeInvite(std::string const& nick);
+
 
 	bool		addToChannel(Client& client);
 	Client*		searchClient(Client& client);

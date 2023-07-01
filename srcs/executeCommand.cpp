@@ -266,11 +266,30 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 	}
 }
 
+void Server::sendInvite(Command &cmd, Client &client) {
+	if (cmd.params.size() < 2)
+	return (cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName())));
+	Channel* ch = searchChannelName(cmd.params[1]);
+	if (ch == NULL)
+		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[1]));
+	if (ch->isChannelOperator(client.getNick()) == false)
+		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[1]));
+	Client* receiver = searchServerForClient(cmd.params[0]);
+	if (receiver == NULL)
+		return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
+	cmd.setBuffer(RPL_INVITING(client.getNick(), ch->getChName(), cmd.params[0]));
+	ch->addToInvites(cmd.params[0]);
+	Command newMessage;
+	newMessage.setClientFd(receiver->getFd());
+	newMessage.setBuffer(RPL_INVITED(client.getNick(), client.user.username, ch->getChName(), cmd.params[0]));
+	receiver->commands.push(newMessage);
+}
+
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
 		return authenticate(cmd, client);
 	if (cmd == "CAP")
-		return ;
+		return cmd.setBuffer(RPL_CAP());
 	if (client.getAuth() == false)
 		return cmd.setBuffer(ERR_NOTREGISTERED(cmd.getCmdName()));
 	if (cmd == "NICK")
@@ -283,17 +302,17 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return joinChannel(cmd, client);
 	if (cmd == "PING")
 		return cmd.setBuffer(RPL_PING(client.user.nick, cmd.getCmdName()));
-	if (cmd == "TOPIC")
-		return executeTopic(cmd, client);
 	if (cmd == "MODE")
 		return setMode(cmd, client);
-	if (cmd == "PRIVMSG")
-		return sendMessage(cmd, client);
-	// if (cmd == "INVITE")
-	// 	return sendInvite(cmd, client);
-	if (cmd == "KICK")
-		return kickUser(cmd, client);
 	if (cmd == "PART")
 		return leaveChannel(cmd, client);
+	if (cmd == "PRIVMSG")
+		return sendMessage(cmd, client);
+	if (cmd == "INVITE")
+		return sendInvite(cmd, client);
+	if (cmd == "TOPIC")
+		return executeTopic(cmd, client);
+	if (cmd == "KICK")
+		return kickUser(cmd, client);
 	return cmd.setBuffer(ERR_UNKNOWNCOMMAND(client.user.nick, cmd.getCmdName()));
 }

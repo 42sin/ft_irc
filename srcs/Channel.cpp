@@ -37,7 +37,7 @@ bool	Channel::isChannelOperator(std::string const& nick) {
 
 bool	Channel::isInvited(Client& client) {
 	for (size_t i = 0; i < _invitedClients.size(); i++) {
-		if (&client == _invitedClients[i])
+		if (client.getNick() == _invitedClients[i])
 			return true;
 	}
 	return false;
@@ -67,9 +67,22 @@ bool	Channel::addToChannel(Client& client) {
 	return true;
 }
 
+void	Channel::addToInvites(std::string const& nick) {
+	_invitedClients.push_back(nick);
+}
+
+void		Channel::removeInvite(std::string const& nick) {
+	std::vector<std::string>::iterator it = std::find(_invitedClients.begin(), _invitedClients.end(), nick);
+	if (it != _invitedClients.end())
+		_invitedClients.erase(it);
+}
+
 void	Channel::removeFromChannel(Client& client) {
 	if (isChannelOperator(client.getNick())) {
 		removeOperator(client.getNick());
+	}
+	if (isInvited(client)) {
+		removeInvite(client.getNick());
 	}
 	for (size_t i = 0; i < _connectedClients.size(); i++) {
 		if (_connectedClients[i] == &client) {
