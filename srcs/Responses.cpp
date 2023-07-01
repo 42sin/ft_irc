@@ -62,7 +62,7 @@ std::string ERR_UNKNOWNCOMMAND(const std::string& nick, const std::string& comma
 
 std::string ERR_NOSUCHNICK(const std::string& nick, const std::string channel_name)
 {
-	std::cout << "User "  << nick << " tried accessing " << channel_name << " but it did not exist!" << "\n";
+	std::cout << nick << " was not found in " << channel_name << "\n";
 	return std::string(":") + "worst.chat" " 401 " + nick + " " + channel_name + " :No such nick/channel\r\n";
 }
 

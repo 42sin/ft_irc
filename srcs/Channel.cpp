@@ -17,6 +17,16 @@ Client*		Channel::searchClient(Client &client) {
 	return NULL;
 }
 
+void		Channel::addToOperators(std::string const& nick) {
+	_channelOperators.push_back(nick);
+}
+
+void		Channel::removeOperator(std::string const& nick) {
+	std::vector<std::string>::iterator it = std::find(_channelOperators.begin(), _channelOperators.end(), nick);
+	if (it != _channelOperators.end())
+		_channelOperators.erase(it);
+}
+
 bool	Channel::isChannelOperator(std::string const& nick) {
 	for (size_t i = 0; i < _channelOperators.size(); i++) {
 		if (nick == _channelOperators[i])
@@ -42,7 +52,7 @@ void	Channel::broadcast(std::string const& message) {
 	}
 }
 
-Channel::Channel(Client& client, std::string channelName) {
+Channel::Channel(Client& client, std::string channelName) : _topicMode(1), _modes("t") {
 	this->_name = channelName;
 	_connectedClients.push_back(&client);
 	_channelOperators.push_back(client.user.nick);

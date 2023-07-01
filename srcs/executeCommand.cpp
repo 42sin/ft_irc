@@ -89,7 +89,7 @@ void	Server::executeTopic(Command &cmd, Client &client)
 	if (cmd.params.size() <= 0)
 		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand()));
 	Channel* ch = searchChannelName(cmd.params[0]);
-	if (ch->getTopicMode() == false && ch->isChannelOperator(client.user.nick) == false)
+	if (ch->getTopicMode() == true && ch->isChannelOperator(client.user.nick) == false)
 		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[0]));
 	if (cmd.params.size() == 1) {
 		if (ch == NULL)
@@ -122,6 +122,80 @@ void	Server::kickUser(Command &cmd, Client &client) {
 	ch->removeFromChannel(*ClientToKick);
 }
 
+bool	checkModeFlag(char c) {
+	if (c == 'i' || c == 't' || c == 'k' || c == 'o' || c == 'l')
+		return c;
+	return false;
+}
+
+std::string	Server::parseMode(std::vector<std::string> const& params, Client& client, Channel* ch) {
+	std::string mode = params[1];
+
+	if (mode.size() != 2)
+		return ERR_UMODEUNKNOWNFLAG(client.getNick());
+	if (mode.front() == '+' || mode.front() == '-') {
+		switch checkModeFlag(mode[1]) {
+			case 'i':
+				ch->setInviteOnly();
+				break ;
+			case 't':
+				ch->setTopicRestrictions();
+				break ;
+			case 'l':
+				if (mode.front() == '+') {
+					if (params.size() != 3)
+						return ERR_NEEDMOREPARAMS("MODE :l");
+					if (params[2].find_first_not_of("0123456789") != std::string::npos)
+						return ERR_UMODEUNKNOWNFLAG(client.getNick());
+					if (std::atoi(params[2]) < INT_MAX && std::atoi(params[2]) != 0)
+						ch->setUserLimit(std::atoi(params[2]));
+				}
+				ch->setUserLimitMode();
+				break ;
+			case 'k':
+				if (mode.front() == '+') {
+					if (params.size() != 3)
+						return ERR_NEEDMOREPARAMS("MODE :k");
+					ch->setPassword(params[2]);
+				}
+				ch->setPasswordMode();
+				break ;
+			case 'o':
+				if (params.size() != 3)
+					return ERR_NEEDMOREPARAMS("MODE :o");
+				if (ch->searchClientByNick(params[2]) == NULL)
+					return ERR_NOSUCHNICK(params[2], ch->getChName());
+				if (mode.front() == '+' && !ch->isChannelOperator(params[2]))
+					ch->addToOperators(params[2]);
+				else if (mode.front() == '-' && ch->isChannelOperator(params[2]))
+					ch->removeOperator(params[2]);
+				break ;
+			default:
+				return ERR_UMODEUNKNOWNFLAG(client.getNick());
+		}
+	}
+	else
+		return ERR_UMODEUNKNOWNFLAG(client.getNick());
+}
+
+
+void	Server::setMode(Command& cmd, Client& client) {
+	if (cmd.params.size() == 0)
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand()));
+	Channel* ch = searchChannelName(cmd.params[0]);
+	if (ch == NULL)
+		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
+	if (cmd.params.size() == 1)
+		return cmd.setBuffer(RPL_CHANNELMODEIS(client.getNick(), ch->getChName(), ch->getModeStr()));
+	if (ch->isChannelOperator(client.getNick()) == false)
+		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.getNick(), cmd.params[0]));
+	if (cmd.params.size() > 1) {
+		if (cmd.params[1].find_first_not_of("+-itkol") != std::string::npos)
+			return cmd.setBuffer(ERR_UMODEUNKNOWNFLAG(client.getNick()));
+		return cmd.setBuffer(parseMode(cmd.params, client, ch));
+	}
+}
+
 
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
@@ -142,8 +216,8 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return cmd.setBuffer(RPL_PING(client.user.nick, cmd.getCmdName()));
 	if (cmd == "TOPIC")
 		return executeTopic(cmd, client);
-	// if (cmd == "MODE")
-	// 	return setMode(cmd, client);
+	if (cmd == "MODE")
+		return setMode(cmd, client);
 	// if (cmd == "PRIVMSG")
 	// 	return sendMessage(cmd, client);
 	// if (cmd == "INVITE")
