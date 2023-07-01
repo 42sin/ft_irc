@@ -28,10 +28,14 @@ public:
 	bool		getInviteMode(void) const { return _inviteOnlyMode; }
 	std::string	getTopic(void) const { return _topic; }
 
+	void		setTopic(std::string const& topic) { _topic = topic; }
+
 	bool		isInvited(Client& client);
-	bool		isChannelOperator(std::string nick);
+	bool		isChannelOperator(std::string const& nick);
 
 	bool		addToChannel(Client& client);
+	Client*		searchClient(Client& client);
+	Client*		searchClientByNick(std::string& nick);
 	void		removeFromChannel(Client& client);
 };
 

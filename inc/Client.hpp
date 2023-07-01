@@ -38,7 +38,7 @@ public:
 	bool			getAuth() const { return _authenticated; }
 	bool			getRegistered() const { return _registered; }
 	std::string&	getBuffer() { return buffer; }
-	std::string		getNick() {return _nick;}
+	std::string		getNick() {return user.nick;}
 
 	bool			operator== (const int& fd) const { return _fd == fd; }
 };

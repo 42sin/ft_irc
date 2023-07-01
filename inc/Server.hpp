@@ -21,8 +21,7 @@ class Server {
 	void		sendToSocket(int index);
 	Client*		searchClientFd(int fd);
 	void		executeCommand(Command& cmd, Client& client);
-	Channel*	searchChannelName(std::string name);
-
+	Channel*	searchChannelName(std::string& name);
 
 	// Commands
 	void	authenticate(Command& cmd, Client& client);
@@ -31,20 +30,21 @@ class Server {
 	void	setNick(Command& cmd, Client& client);
 	void	setUser(Command& cmd, Client& client);
 	void	setMode(Command& cmd, Client& client);
-	void	setTopic(Command& cmd, Client& client);
 
 	void	sendPing(Command& cmd, Client& client);
 	void	sendMessage(Command& cmd, Client& client);
 	void	sendInvite(Command& cmd, Client& client);
+
+	void	executeTopic(Command &cmd, Client &client);
 
 	void	kickUser(Command& cmd, Client& client);
 	void	joinChannel(Command& cmd, Client& client);
 	void	leaveChannel(Command& cmd, Client& client);
 	void	leaveServer(Command& cmd, Client& client);
 
-	Channel getChanel(std::string chanel);
 
 public:
+	
 	Server();
 	Server(const int port, const char* password);
 	~Server();

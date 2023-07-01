@@ -51,7 +51,7 @@ bool	validChannelName(std::string const& name) {
 	return true;
 }
 
-Channel*	Server::searchChannelName(std::string name) {
+Channel*	Server::searchChannelName(std::string& name) {
 	for (size_t i = 0; i < _channels.size(); i++) {
 		if (_channels[i]->getChName() == name)
 			return _channels[i];
@@ -84,40 +84,42 @@ void	Server::joinChannel(Command& cmd, Client& client) {
 	}
 }
 
-void	Command::executeTopic(Command &cmd, Client &client)
+void	Server::executeTopic(Command &cmd, Client &client)
 {
-	Channel* ch = Server::getChannel(cmd.argument[0]);
-	if (cmd.arguments.size() == 0)
-		return ERR_NEEDMOREPARAMS(cmd.getCommand());
-	else if (cmd.arguments.size() == 1) {
+	if (cmd.params.size() <= 0)
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand()));
+	Channel* ch = searchChannelName(cmd.params[0]);
+	if (ch->getTopicMode() == false && ch->isChannelOperator(client.user.nick) == false)
+		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[0]));
+	if (cmd.params.size() == 1) {
 		if (ch == NULL)
-			return (ERR_NOSUCHCHANNEL(client.GetNick(), cmd.arguments[0]));
+			return (cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0])));
 		else {
-			if (ch._chanel.empty())
-				return (RPL_NOTOPIC(client.GetNick(), ch.GetChName()));
-			else 
-				return (RPL_TOPIC(client.GetNick(), ch.getChName(), ch.getTopic()));
+			if (ch->getTopic().empty())
+				return (cmd.setBuffer(RPL_NOTOPIC(client.getNick(), ch->getChName())));
+			else
+				return (cmd.setBuffer(RPL_TOPIC(client.getNick(), ch->getChName(), ch->getTopic())));
 		}
 	}
-	else if (cmd.argument.size() == 2){
-		ch.setTopic(cmd.arguments[1]);
-		return RPL_TOPICCHANGE(client.GetNick(), client.user.username, ch.getChName(), ch.getTopic());
+	else if (cmd.params.size() == 2){
+		ch->setTopic(cmd.params[1]);
+		return cmd.setBuffer(RPL_TOPICCHANGE(client.getNick(), client.user.username, ch->getChName(), ch->getTopic()));
 	}
 }
 
-void	Command::executeKick(Command &cmd, Client &client) {
-	if (cmd.arguments.size() <= 1)
-		return (ERR_NEEDMOREPARAMS(cmd.getCommand()));
-	else if (Channel ch = Server::getChanel(cmd.arguments[0]) == NULL)
-		return (ERR_NOSUCHCHANNEL(client.getNick()), cmd.arguments[0]);
-	else if (ch.isChannelOperator(clinent.user->_nick) == false)
-		return (ERR_CHANOPRIVSNEEDED(client.user->nick));
-	std::vector<char>iterator it = std::find(ch.begin(), ch.end(), cmd.argument[1]);
-	if (it != ch.end())
-	{
-		ch.erase(it);
-		return (RPL_KICK(client.user->nick, client.user->user, ch.getChName(), "please contact your channel operator!"));
-	}
+void	Server::kickUser(Command &cmd, Client &client) {
+	if (cmd.params.size() < 2)
+		return (cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand())));
+	Channel* ch = searchChannelName(cmd.params[0]);
+	if (ch == NULL)
+		return (cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0])));
+	else if (ch->isChannelOperator(client.user.nick) == false)
+		return (cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[0])));
+	Client *ClientToKick = ch->searchClientByNick(cmd.params[1]);
+	if (ClientToKick == NULL)
+		return ;
+	ch->broadcast(RPL_KICK(client.user.nick, client.user.username, ch->getChName(), cmd.params[1], "please contact your channel operator!"));
+	ch->removeFromChannel(*ClientToKick);
 }
 
 
@@ -146,9 +148,8 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 	// 	return sendMessage(cmd, client);
 	// if (cmd == "INVITE")
 	// 	return sendInvite(cmd, client);
-
-	// if (cmd == "KICK")
-	// 	return kickUser(cmd, client);
+	if (cmd == "KICK")
+		return kickUser(cmd, client);
 	// if (cmd == "OPER")
 	// 	return makeAdmin(cmd, client);
 	// if (cmd == "PART")

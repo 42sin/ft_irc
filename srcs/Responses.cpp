@@ -74,7 +74,7 @@ std::string ERR_CANNOTSENDTOCHAN(const std::string& nick, const std::string& cha
 
 std::string ERR_CHANOPRIVSNEEDED(const std::string& nick, const std::string& channel_name)
 {
-	std::cout << nick << " tried changing mode for " << channel_name << " but did not have op permissions!" << "\n";
+	std::cout << nick << " tried executing a command for " << channel_name << " but did not have op permissions!" << "\n";
 	return std::string(":") + "worst.chat" + " 482 " + nick + " " + channel_name + " :You're not channel operator \r\n";
 }
 

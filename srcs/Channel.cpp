@@ -1,6 +1,23 @@
 #include "../inc/Channel.hpp"
 
-bool	Channel::isChannelOperator(std::string nick) {
+
+Client*		Channel::searchClientByNick(std::string& nick) {
+	for (size_t i = 0; i < _connectedClients.size(); i++) {
+		if (_connectedClients[i]->getNick() == nick)
+			return _connectedClients[i];
+	}
+	return NULL;
+}
+
+Client*		Channel::searchClient(Client &client) {
+	for (size_t i = 0; i < _connectedClients.size(); i++) {
+		if (_connectedClients[i] == &client)
+			return _connectedClients[i];
+	}
+	return NULL;
+}
+
+bool	Channel::isChannelOperator(std::string const& nick) {
 	for (size_t i = 0; i < _channelOperators.size(); i++) {
 		if (nick == _channelOperators[i])
 			return true;
