@@ -62,7 +62,7 @@ std::string ERR_UNKNOWNCOMMAND(const std::string& nick, const std::string& comma
 
 std::string ERR_NOSUCHNICK(const std::string& nick, const std::string channel_name)
 {
-	std::cout << nick << " was not found in " << channel_name << "\n";
+	std::cout << nick << " was not found " << "\n";
 	return std::string(":") + "worst.chat" " 401 " + nick + " " + channel_name + " :No such nick/channel\r\n";
 }
 
@@ -157,7 +157,7 @@ std::string RPL_SETMODECLIENT(const std::string& nick, const std::string& user, 
 
 std::string RPL_PART(const std::string& nick, const std::string& user, const std::string& channel_name, const std::string reason)
 {
-	std::cout << nick << " just parted channel " << channel_name + " because of: " + reason + "!" << "\n";
+	std::cout << nick << " just parted channel " << channel_name + " ; " + reason + "!" << "\n";
 	return std::string(":") + nick + "!" + user + "@" + "localhost" + " PART " + channel_name + " " + reason + "!" +  "\r\n";
 }
 

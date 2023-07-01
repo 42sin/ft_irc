@@ -7,6 +7,14 @@ void	Server::addSocketToPoll(int	socketFd, short events) {
 	_pollFds.push_back(pollFd);
 }
 
+Client*		Server::searchServerForClient(std::string const& nick) {
+	for (size_t i = 0; i < _clients.size(); i++) {
+		if (_clients[i]->getNick() == nick)
+			return _clients[i];
+	}
+	return NULL;
+}
+
 bool	Server::controlPolls(void) {
 	_pollFds.clear();
 	addSocketToPoll(_serverSocketFd, POLLIN);

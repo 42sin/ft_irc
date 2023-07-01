@@ -217,7 +217,7 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 
 void	Server::setMode(Command& cmd, Client& client) {
 	if (cmd.params.size() == 0)
-		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCommand()));
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
 	Channel* ch = searchChannelName(cmd.params[0]);
 	if (ch == NULL)
 		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
@@ -232,6 +232,39 @@ void	Server::setMode(Command& cmd, Client& client) {
 	}
 }
 
+void	Server::leaveChannel(Command& cmd, Client& client) {
+	if (cmd.params.size() != 1)
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
+	Channel* ch = searchChannelName(cmd.params[0]);
+	if (ch == NULL)
+		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
+	std::string nick = client.getNick();
+	std::string user = client.user.username;
+	ch->removeFromChannel(client);
+	ch->broadcast(RPL_PART(nick, user, ch->getChName(), "goodbye"));
+}
+
+void	Server::sendMessage(Command& cmd, Client& client) {
+	if (cmd.params.size() != 1 || cmd.getTrail().empty())
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
+	if (cmd.params[0].front() != '#') {
+		Client* receiver = searchServerForClient(cmd.params[0]);
+		if (receiver == NULL)
+			return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
+		Command newMessage;
+		newMessage.setClientFd(receiver->getFd());
+		newMessage.setBuffer(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + "PRIVMSG " + receiver->getNick() + " :" + cmd.getTrail() + "\r\n"));
+		receiver->commands.push(newMessage);
+	}
+	else {
+		Channel* ch = searchChannelName(cmd.params[0]);
+		if (ch == NULL)
+			return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
+		if (ch->searchClient(client) == NULL)
+			return cmd.setBuffer(ERR_CANNOTSENDTOCHAN(client.getNick(), cmd.params[0]));
+		ch->broadcast(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + "PRIVMSG " + ch->getChName() + " :" + cmd.getTrail() + "\r\n"));
+	}
+}
 
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
@@ -254,17 +287,13 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return executeTopic(cmd, client);
 	if (cmd == "MODE")
 		return setMode(cmd, client);
-	// if (cmd == "PRIVMSG")
-	// 	return sendMessage(cmd, client);
+	if (cmd == "PRIVMSG")
+		return sendMessage(cmd, client);
 	// if (cmd == "INVITE")
 	// 	return sendInvite(cmd, client);
 	if (cmd == "KICK")
 		return kickUser(cmd, client);
-	// if (cmd == "OPER")
-	// 	return makeAdmin(cmd, client);
-	// if (cmd == "PART")
-	// 	return leaveChannel(cmd, client);
-	// if (cmd == "QUIT")
-	// 	return leaveServer(cmd, client);
+	if (cmd == "PART")
+		return leaveChannel(cmd, client);
 	return cmd.setBuffer(ERR_UNKNOWNCOMMAND(client.user.nick, cmd.getCmdName()));
 }

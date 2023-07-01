@@ -31,6 +31,8 @@ class Server {
 	void		setUser(Command& cmd, Client& client);
 	void		setMode(Command& cmd, Client& client);
 	std::string	parseMode(std::vector<std::string>const& mode, Client& client, Channel* ch);
+	
+	Client*		searchServerForClient(std::string const& nick);
 
 	void		sendPing(Command& cmd, Client& client);
 	void		sendMessage(Command& cmd, Client& client);
