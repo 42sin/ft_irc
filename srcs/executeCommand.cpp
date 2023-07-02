@@ -106,7 +106,7 @@ void	Server::executeTopic(Command &cmd, Client &client)
 	Channel* ch = searchChannelName(cmd.params[0]);
 	if (ch->getTopicMode() == true && ch->isChannelOperator(client.user.nick) == false)
 		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.user.nick, cmd.params[0]));
-	if (cmd.params.size() == 1) {
+	if (cmd.params.size() == 1 && cmd.getTrail().empty()) {
 		if (ch == NULL)
 			return (cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0])));
 		else {
@@ -116,8 +116,8 @@ void	Server::executeTopic(Command &cmd, Client &client)
 				return (cmd.setBuffer(RPL_TOPIC(client.getNick(), ch->getChName(), ch->getTopic())));
 		}
 	}
-	else if (cmd.params.size() == 2){
-		ch->setTopic(cmd.params[1]);
+	else if (cmd.params.size() == 1 && !cmd.getTrail().empty()){
+		ch->setTopic(cmd.getTrail());
 		return cmd.setBuffer(RPL_TOPICCHANGE(client.getNick(), client.user.username, ch->getChName(), ch->getTopic()));
 	}
 }
