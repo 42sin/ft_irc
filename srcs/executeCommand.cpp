@@ -7,8 +7,10 @@ void	Server::authenticate(Command& cmd, Client& client) {
 		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
 	if (cmd.params.size() > 1 || cmd.params[0] != _password)
 		return cmd.setBuffer(ERR_PASSWDMISMATCH());
+	if (client.getAuth() == true)
+		return cmd.setBuffer(ERR_ALREADYREGISTRED());
 	client.setAuth();
-	std::cout << "Password successfully authenticated for Client: " << client.getFd() << std::endl;
+	std::cout << "Password successfully authenticated for Client" << std::endl;
 }
 
 void	Server::setNick(Command& cmd, Client& client) {
@@ -20,7 +22,7 @@ void	Server::setNick(Command& cmd, Client& client) {
 		if (_clients[i]->user.nick == cmd.params[0])
 			return cmd.setBuffer(ERR_NICKNAMEINUSE(cmd.params[0]));
 	}
-	if (client.getRegistered() == true) // maybe add broadcast to channels
+	if (client.getRegistered() == true)
 		cmd.setBuffer(RPL_NICKCHANGE(client.user.nick, cmd.params[0], client.user.username));
 	else if (!client.user.username.empty()) {
 		client.setRegistered();
@@ -319,6 +321,8 @@ void	Server::sendInvite(Command &cmd, Client &client) {
 	Client* receiver = searchServerForClient(cmd.params[0]);
 	if (receiver == NULL)
 		return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
+	if (ch->searchClientByNick(receiver->getNick()) != NULL)
+		return cmd.setBuffer(ERR_USERONCHANNEL(client.getNick(), ch->getChName(), receiver->getNick()));
 	cmd.setBuffer(RPL_INVITING(client.getNick(), ch->getChName(), cmd.params[0]));
 	ch->addToInvites(cmd.params[0]);
 	newMessage(receiver, RPL_INVITED(client.getNick(), client.user.username, ch->getChName(), cmd.params[0]));

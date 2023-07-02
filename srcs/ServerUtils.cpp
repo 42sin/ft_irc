@@ -41,7 +41,7 @@ void	Server::closeConnection(int index) {
 		int clientFd = _pollFds[index].fd;
 		close(clientFd);
 		_pollFds.erase(_pollFds.begin() + index);
-		std::cout << "Client disconnected: " << clientFd << std::endl;
+		std::cout << "Client disconnected" << std::endl;
 		_disconnectedClients.push_back(clientFd);
 }
 
@@ -73,7 +73,7 @@ void	Server::receive(int index) {
 			std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
 		else {
 			_clients.push_back(new Client(clientFd));
-			std::cout << "New client connected: " << clientFd << std::endl;
+			std::cout << "New client connected" << std::endl;
 		}
 	}
 	else {
@@ -102,7 +102,7 @@ void	Server::receive(int index) {
 			}
 		}
 		if (bytesRead == 0) {
-			std::cout << "Client disconnected: " << clientFd << std::endl;
+			std::cout << "Client disconnected" << std::endl;
 			_disconnectedClients.push_back(clientFd);
 		}
 		else if (bytesRead < 0) {

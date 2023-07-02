@@ -32,7 +32,7 @@ std::string ERR_NONICKNAMEGIVEN()
 
 std::string ERR_NOTREGISTERED(const std::string& command)
 {
-	std::cout << "User tried executing command " << command << " but was not registred!" << "\n";
+	std::cout << "User tried executing command " << command << " but was not registered!" << "\n";
 	return std::string(":") + "worst.chat" + " 451 " + ":You have not registered\r\n";
 }
 
@@ -46,12 +46,6 @@ std::string ERR_ERRONEUSNICKNAME(const std::string& nick, const std::string& wro
 {
 	std::cout << nick << "tried using invalid nick: " << wrong_nick  << "!" << "\n";
 	return std::string(":") + "worst.chat" + " 432 " + nick + " " + wrong_nick + " :Erroneous nickname\r\n";
-}
-
-std::string ERR_USERSDONTMATCH(const std::string& nick, const std::string& target)
-{
-	std::cout << nick << "tried changing mode for " << target << "!" << "\n";
-	return std::string(":") + "worst.chat" + " 502 " + nick + " : Cannot change mode for other users\r\n";
 }
 
 std::string ERR_UNKNOWNCOMMAND(const std::string& nick, const std::string& command)
@@ -96,18 +90,6 @@ std::string ERR_USERONCHANNEL(const std::string& nick, const std::string& channe
 	return std::string(":") + "worst.chat" + " 443 " + nick + " " + channel_name + " :Is already on channel \r\n";
 }
 
-std::string ERR_USERNOTINCHANNEL(const std::string& nick, const std::string& channel_name)
-{
-	std::cout << nick << " is not in"  << channel_name << "!" << "\n";
-	return std::string(":") + "441 " + "worst.chat" + " " + nick + " " + channel_name + " : is not on channel \r\n";
-}
-
-std::string ERR_NOTONCHANNEL(const std::string nick, const std::string channel_name)
-{
-	std::cout << nick << "tried using command on channel he isn't registered to!" << "\n";
-	return std::string(":") + "worst.chat" + + " 401 " + nick + " " + channel_name + " :You're not on that channel \r\n";
-}
-
 std::string ERR_INVITEONLYCHAN(const std::string& nick, const std::string& channel_name)
 {
 	std::cout << nick << " tried joining " << channel_name << " but he was not invited!" << "\n";
@@ -149,12 +131,6 @@ std::string RPL_PING(const std::string& nick, const std::string& token)
 	return std::string(":") + "worst.chat" + " PONG " + "worst.chat" + " :" + token + "\r\n";
 }
 
-std::string RPL_SETMODECLIENT(const std::string& nick, const std::string& user, const std::string& channel_name, const std::string& mode, const std::string& target)
-{
-	std::cout << nick << " adjusted the mode of " << target << " by " << mode << "\n";
-	return std::string(":") + nick + "!" + user + "@" + "localhost" + " MODE " + channel_name + " " + mode + " " + target + "\r\n";
-}
-
 std::string RPL_PART(const std::string& nick, const std::string& user, const std::string& channel_name, const std::string reason)
 {
 	std::cout << nick << " just parted channel " << channel_name + " ; " + reason + "!" << "\n";
@@ -167,12 +143,6 @@ std::string	RPL_PRIVMSG(const std::string& nick, const std::string& user, const 
 	return std::string(":") + nick + "!" + user + "@" + "localhost" + " PRIVMSG " + target + " :" + msg + "\r\n";
 }
 
-std::string	RPL_NOTICE(const std::string& nick, const std::string& user, const std::string& target, const std::string& msg)
-{
-	std::cout << nick << " send message " << msg + " to " + target +  "!" << "\n";
-	return std::string(":") + nick + "!" + user + "@" + "localhost" + " NOTICE " + target + " :" + msg + "\r\n";
-}
-
 std::string RPL_TOPICCHANGE(const std::string& nick, const std::string& user, const std::string& channel_name, const std::string& topic)
 {
 	std::cout << nick << " set the topic of " << channel_name << " to " << topic << "!" << "\n";
@@ -183,12 +153,6 @@ std::string RPL_KICK(const std::string& nick, const std::string& user, const std
 {
 	std::cout << nick << " kicked " << target << " of " << channel_name << " because: " << reason << "!" << "\n";
 	return std::string(":") +  nick + "!" + user + "@" + "localhost" + " KICK " + channel_name + " " + target + " :" + reason + "\r\n";
-}
-
-std::string RPL_QUIT(const std::string& nick, const std::string& user)
-{
-	std::cout << nick << " left the server!" << "\n";
-	return std::string(":") + nick + "!" + user + "@" + "localhost" + " " + "QUIT :" + "Goodbye!" + "\r\n";
 }
 
 std::string RPL_BOT(const std::string& nick, const std::string& channel_name, const std::string& msg)
@@ -207,23 +171,6 @@ std::string RPL_WELCOME(const std::string& nick, const std::string user)
 {
 	std::cout << "User: " << user << " succesfully registered to the server, using nick " << nick << "!" << "\n";
 	return std::string(":") + "worst.chat" + " 001 " + nick + " :Welcome to the ft_irc network " + nick + "!" + user + "@" + "localhost" + "\r\n";
-}
-
-std::string RPL_NAMREPLY(const std::string& nick, const std::string& channel_name, const std::string& names_list)
-{
-	return std::string(":") + "worst.chat" + " 353 " + nick + " = " + channel_name + " :" +  names_list + "\r\n";
-}
-
-std::string RPL_ENDOFNAMES(const std::string& nick, const std::string& channel_name)
-{
-	std::cout << nick << " requested client-list of channel " << channel_name  << "!" << "\n";
-	return std::string(":")  + "worst.chat" + " 366 " + nick + " " + channel_name + " :END of NAMES list\r\n";
-}
-
-std::string RPL_MODEUSER(const std::string& nick, const std::string& mode)
-{
-	std::cout << nick << " set his mode to " << mode << "\n";
-	return std::string(":") + "worst.chat" + " 221 " + nick + " " + mode + "\r\n";
 }
 
 std::string RPL_CHANNELMODEIS(const std::string& nick, const std::string& channel_name, const std::string& mode)
