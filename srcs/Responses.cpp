@@ -80,7 +80,7 @@ std::string ERR_CHANOPRIVSNEEDED(const std::string& nick, const std::string& cha
 
 std::string ERR_NOPRIVS(const std::string& nick, const std::string& command)
 {
-	std::cout << nick << "tried executing OP Command " << command << " but is not Operator!" << "\n";
+	std::cout << nick << " tried executing OP Command " << command << " but is not Operator!" << "\n";
 	return std::string(":") + "worst.chat" + " 481 " + command + " :Permission Denied- You're not an IRC operator\r\n";
 }
 
@@ -245,7 +245,7 @@ std::string RPL_SETMODECHANNEL(const std::string& nick, const std::string& chann
 std::string RPL_YOUREOPER(const std::string& nick, const std::string& target)
 {
 	std::cout << nick << " make " << target << " a server operator!" << "\n";
-	return std::string(":") + "worst.chat" + " 381 " + "PASS :You are now an IRC operator\r\n";
+	return std::string(":") + "worst.chat" + " 381 " + ":You are now an IRC operator\r\n";
 }
 
 std::string	RPL_INVITING(const std::string& nick, const std::string& channel_name, const std::string& target)

@@ -16,5 +16,6 @@
 #include "Client.hpp"
 #include "Responses.hpp"
 #include "Channel.hpp"
+#include "shutdown.hpp"
 
 #endif

@@ -9,8 +9,7 @@ class Client {
 	int			_fd;
 	bool		_authenticated;
 	bool		_registered;
-	//bool		_admin;
-
+	bool		_admin;
 
 public:
 
@@ -33,8 +32,10 @@ public:
 	void			setFd(int fd) { _fd = fd; }
 	void			setAuth(void) { _authenticated = 1; }
 	void			setRegistered(void) { _registered = 1; }
+	void			setAdmin(void) { _admin = 1; }
 
 	int				getFd() const { return _fd; }
+	bool			getAdmin() const { return _admin; }
 	bool			getAuth() const { return _authenticated; }
 	std::string		getNick(void) const {return user.nick;}
 	bool			getRegistered() const { return _registered; }

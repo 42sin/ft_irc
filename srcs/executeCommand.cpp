@@ -290,7 +290,7 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 	}
 }
 
-void Server::sendInvite(Command &cmd, Client &client) {
+void	Server::sendInvite(Command &cmd, Client &client) {
 	if (cmd.params.size() < 2)
 	return (cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName())));
 	Channel* ch = searchChannelName(cmd.params[1]);
@@ -307,6 +307,18 @@ void Server::sendInvite(Command &cmd, Client &client) {
 	newMessage.setClientFd(receiver->getFd());
 	newMessage.setBuffer(RPL_INVITED(client.getNick(), client.user.username, ch->getChName(), cmd.params[0]));
 	receiver->commands.push(newMessage);
+}
+
+void	Server::makeAdmin(Command& cmd, Client& client) {
+	if (cmd.params.size() < 2)
+		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
+	Client*	target = searchServerForClient(cmd.params[0]);
+	if (target == NULL)
+		return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "server"));
+	if (cmd.params[1] != "abc123")
+		return cmd.setBuffer(ERR_PASSWDMISMATCH());
+	target->setAdmin();
+	return cmd.setBuffer(RPL_YOUREOPER(client.getNick(), target->getNick()));
 }
 
 void	Server::executeCommand(Command& cmd, Client& client) {
@@ -338,5 +350,12 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 		return executeTopic(cmd, client);
 	if (cmd == "KICK")
 		return kickUser(cmd, client);
+	if (cmd == "OPER")
+		return makeAdmin(cmd, client);
+	if (cmd == "SHUTDOWN") {
+		if (client.getAdmin() == true)
+			return shutdown(0);
+		return cmd.setBuffer(ERR_NOPRIVS(client.getNick(), "SHUTDOWN"));
+	}
 	return cmd.setBuffer(ERR_UNKNOWNCOMMAND(client.user.nick, cmd.getCmdName()));
 }
