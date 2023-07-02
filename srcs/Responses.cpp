@@ -193,12 +193,8 @@ std::string RPL_QUIT(const std::string& nick, const std::string& user)
 
 std::string RPL_BOT(const std::string& nick, const std::string& channel_name, const std::string& msg)
 {
-	std::cout << nick << " requested a bot on " << channel_name << "!" << "\n";
-	std::string partial_msg, total_msg;
-	std::istringstream iss(msg);
-	while(getline(iss, partial_msg, '\n'))
-		total_msg = total_msg + ":BLACKJACKBOT!BOT@" + "worst.chat" + " NOTICE " + channel_name + " :" + partial_msg + "\r\n";
-	return total_msg;
+	std::cout << nick << " used a bot command on " << channel_name << "!" << "\n";
+	return std::string(":COINFLIPBOT!BOT@worst.chat") + " NOTICE " + channel_name + " :" + msg + "\r\n";
 }
 
 std::string	RPL_INVITED(const std::string& nick, const std::string& user, const std::string& channel_name, const std::string& target)

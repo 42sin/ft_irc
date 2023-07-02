@@ -27,8 +27,6 @@ public:
 	Command();
 	~Command();
 
-	bool checkPass(std::string input_pass);
-	std::string executePass();
 	void		setBuffer(std::string str) { _buffer = str; }
 	void		setClientFd(int fd) { _clientFd = fd; }
 

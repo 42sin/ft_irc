@@ -3,6 +3,8 @@
 
 #include "headers.hpp"
 
+void		newMessage(Client *receiver, std::string const& message);
+
 class Server {
 	const int				_port;
 	const char*				_password;
@@ -34,7 +36,6 @@ class Server {
 	
 	Client*		searchServerForClient(std::string const& nick);
 
-	void		sendPing(Command& cmd, Client& client);
 	void		sendMessage(Command& cmd, Client& client);
 	void		sendInvite(Command& cmd, Client& client);
 
@@ -43,8 +44,6 @@ class Server {
 	void		kickUser(Command& cmd, Client& client);
 	void		joinChannel(Command& cmd, Client& client);
 	void		leaveChannel(Command& cmd, Client& client);
-	void		leaveServer(Command& cmd, Client& client);
-
 
 public:
 	

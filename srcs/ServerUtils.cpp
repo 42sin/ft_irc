@@ -30,6 +30,13 @@ bool	Server::controlPolls(void) {
 	return true;
 }
 
+void	newMessage(Client* receiver, std::string const& message) {
+	Command newMessage;
+	newMessage.setClientFd(receiver->getFd());
+	newMessage.setBuffer(message);
+	receiver->commands.push(newMessage);
+}
+
 void	Server::closeConnection(int index) {
 		int clientFd = _pollFds[index].fd;
 		close(clientFd);

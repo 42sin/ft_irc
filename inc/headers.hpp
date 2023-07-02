@@ -7,6 +7,8 @@
 #include <netinet/in.h>
 #include <cstring>
 #include <fcntl.h>
+#include <ctime>
+#include <cstdlib>
 #include <unistd.h>
 #include <poll.h>
 #include <vector>

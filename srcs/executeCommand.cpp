@@ -160,7 +160,7 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 						ch->eraseFromMode(index);
 					ch->setInviteOnly(false);
 				}
-				ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + mode));
+				ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				break ;
 			case 't':
 				if (mode.front() == '+') {
@@ -174,7 +174,7 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 						ch->eraseFromMode(index);
 					ch->setTopicRestrictions(false);
 				}
-				ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + mode));
+				ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				break ;
 			case 'l':
 				if (mode.front() == '+') {
@@ -187,14 +187,14 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 					ch->setUserLimitMode(true);
 					if (ch->getModeStr().find('l') == std::string::npos)
 						ch->appendToMode('l');
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				else {
 					ch->setUserLimitMode(false);
 					size_t index = ch->getModeStr().find('l');
 					if (index != std::string::npos)
 						ch->eraseFromMode(index);
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				break ;
 			case 'k':
@@ -205,14 +205,14 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 						ch->appendToMode('k');
 					ch->setPassword(params[2]);
 					ch->setPasswordMode(true);
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				else {
 					size_t index = ch->getModeStr().find('k');
 					if (index != std::string::npos)
 						ch->eraseFromMode(index);
 					ch->setPasswordMode(false);
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + "\r\n"));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				break ;
 			case 'o':
@@ -222,11 +222,11 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 					return ERR_NOSUCHNICK(params[2], ch->getChName());
 				if (mode.front() == '+' && !ch->isChannelOperator(params[2])) {
 					ch->addToOperators(params[2]);
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				else if (mode.front() == '-' && ch->isChannelOperator(params[2])) {
 					ch->removeOperator(params[2]);
-					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
+					ch->broadcast(RPL_SETMODECHANNEL(client.getNick(), ch->getChName(), mode));
 				}
 				break ;
 			default:
@@ -246,7 +246,7 @@ void	Server::setMode(Command& cmd, Client& client) {
 	if (ch == NULL)
 		return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
 	if (cmd.params.size() == 1)
-		return cmd.setBuffer(RPL_CHANNELMODEIS(client.getNick(), ch->getChName(), ch->getModeStr()));
+		return cmd.setBuffer(RPL_CHANNELMODEIS(client.getNick(), ch->getChName(), std::string("+") += ch->getModeStr()));
 	if (ch->isChannelOperator(client.getNick()) == false)
 		return cmd.setBuffer(ERR_CHANOPRIVSNEEDED(client.getNick(), cmd.params[0]));
 	if (cmd.params.size() > 1) {
@@ -268,6 +268,18 @@ void	Server::leaveChannel(Command& cmd, Client& client) {
 	ch->broadcast(RPL_PART(nick, user, ch->getChName(), "goodbye"));
 }
 
+std::string	coinFlip(std::string const& choice) {
+	std::string result("\nFlipping Coin...\n");
+	srand(time(0));
+	int flip = rand() % 2;
+
+	if (flip == 0)
+		result += "You won! I flipped " + choice + "\n:) Congratulations!";
+	else
+		result += "You lost! I didn't flip " + choice + "\n:( Better luck next time!";
+	return result;
+}
+
 void	Server::sendMessage(Command& cmd, Client& client) {
 	if (cmd.params.size() != 1 || cmd.getTrail().empty())
 		return cmd.setBuffer(ERR_NEEDMOREPARAMS(cmd.getCmdName()));
@@ -275,10 +287,7 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 		Client* receiver = searchServerForClient(cmd.params[0]);
 		if (receiver == NULL)
 			return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
-		Command newMessage;
-		newMessage.setClientFd(receiver->getFd());
-		newMessage.setBuffer(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + cmd.getCmdName() + " " + receiver->getNick() + " :" + cmd.getTrail() + "\r\n"));
-		receiver->commands.push(newMessage);
+		newMessage(receiver, RPL_PRIVMSG(client.getNick(), client.user.username, receiver->getNick(), cmd.getTrail()));
 	}
 	else {
 		Channel* ch = searchChannelName(cmd.params[0]);
@@ -286,7 +295,16 @@ void	Server::sendMessage(Command& cmd, Client& client) {
 			return cmd.setBuffer(ERR_NOSUCHCHANNEL(client.getNick(), cmd.params[0]));
 		if (ch->searchClient(client) == NULL)
 			return cmd.setBuffer(ERR_CANNOTSENDTOCHAN(client.getNick(), cmd.params[0]));
-		ch->broadcast(std::string(":" + client.getNick() + "!" + client.user.username + "@localhost " + cmd.getCmdName() + " " + ch->getChName() + " :" + cmd.getTrail() + "\r\n"));
+		static bool calledBot = false;
+		if (calledBot == false && cmd.getTrail() == "!bot") {
+			calledBot = true;
+			return cmd.setBuffer(RPL_BOT(client.getNick(), ch->getChName(), "\n++++++++++++++++++\nCoinflip\n!head or !tails?\n++++++++++++++++++"));
+		}
+		if (calledBot == true && (cmd.getTrail() == "!tails" || cmd.getTrail() == "!head")) {
+			calledBot = false;
+			return cmd.setBuffer(RPL_BOT(client.getNick(), ch->getChName(), coinFlip(cmd.getTrail())));
+		}
+		ch->broadcast(RPL_PRIVMSG(client.getNick(), client.user.username, ch->getChName(), cmd.getTrail()));
 	}
 }
 
@@ -303,10 +321,7 @@ void	Server::sendInvite(Command &cmd, Client &client) {
 		return cmd.setBuffer(ERR_NOSUCHNICK(cmd.params[0], "worst.chat"));
 	cmd.setBuffer(RPL_INVITING(client.getNick(), ch->getChName(), cmd.params[0]));
 	ch->addToInvites(cmd.params[0]);
-	Command newMessage;
-	newMessage.setClientFd(receiver->getFd());
-	newMessage.setBuffer(RPL_INVITED(client.getNick(), client.user.username, ch->getChName(), cmd.params[0]));
-	receiver->commands.push(newMessage);
+	newMessage(receiver, RPL_INVITED(client.getNick(), client.user.username, ch->getChName(), cmd.params[0]));
 }
 
 void	Server::makeAdmin(Command& cmd, Client& client) {
