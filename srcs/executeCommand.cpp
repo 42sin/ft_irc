@@ -137,6 +137,10 @@ void Server::sendInvite(Command &cmd, Client &client) {
 	return (SPL_INVITED);
 }
 
+void 	sendPrivateMessage(Command &cmd, Client &client) {
+	
+}
+
 void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
 		return authenticate(cmd, client);
