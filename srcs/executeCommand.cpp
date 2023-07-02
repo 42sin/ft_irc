@@ -149,17 +149,31 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 	if (mode.front() == '+' || mode.front() == '-') {
 		switch (checkModeFlag(mode[1])) {
 			case 'i':
-				if (mode.front() == '+')
+				if (mode.front() == '+') {
+					if (ch->getModeStr().find('i') == std::string::npos)
+						ch->appendToMode('i');
 					ch->setInviteOnly(true);
-				else
+				}
+				else {
+					size_t index = ch->getModeStr().find('i');
+					if (index != std::string::npos)
+						ch->eraseFromMode(index);
 					ch->setInviteOnly(false);
+				}
 				ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + mode));
 				break ;
 			case 't':
-				if (mode.front() == '+')
+				if (mode.front() == '+') {
+					if (ch->getModeStr().find('t') == std::string::npos)
+						ch->appendToMode('t');
 					ch->setTopicRestrictions(true);
-				else
+				}
+				else {
+					size_t index = ch->getModeStr().find('t');
+					if (index != std::string::npos)
+						ch->eraseFromMode(index);
 					ch->setTopicRestrictions(false);
+				}
 				ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + mode));
 				break ;
 			case 'l':
@@ -171,10 +185,15 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 					if (std::atoi(params[2].c_str()) < INT_MAX && std::atoi(params[2].c_str()) != 0)
 						ch->setUserLimit(std::atoi(params[2].c_str()));
 					ch->setUserLimitMode(true);
+					if (ch->getModeStr().find('l') == std::string::npos)
+						ch->appendToMode('l');
 					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
 				}
 				else {
 					ch->setUserLimitMode(false);
+					size_t index = ch->getModeStr().find('l');
+					if (index != std::string::npos)
+						ch->eraseFromMode(index);
 					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode));
 				}
 				break ;
@@ -182,11 +201,16 @@ std::string	Server::parseMode(std::vector<std::string> const& params, Client& cl
 				if (mode.front() == '+') {
 					if (params.size() != 3)
 						return ERR_NEEDMOREPARAMS("MODE :k");
+					if (ch->getModeStr().find('k') == std::string::npos)
+						ch->appendToMode('k');
 					ch->setPassword(params[2]);
 					ch->setPasswordMode(true);
 					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + " " + params[2]));
 				}
 				else {
+					size_t index = ch->getModeStr().find('k');
+					if (index != std::string::npos)
+						ch->eraseFromMode(index);
 					ch->setPasswordMode(false);
 					ch->broadcast(std::string(":" + client.getNick() + " MODE " + ch->getChName() + " " + mode + "\r\n"));
 				}
@@ -289,7 +313,7 @@ void	Server::executeCommand(Command& cmd, Client& client) {
 	if (cmd == "PASS")
 		return authenticate(cmd, client);
 	if (cmd == "CAP")
-		return cmd.setBuffer(RPL_CAP());
+		return ;
 	if (client.getAuth() == false)
 		return cmd.setBuffer(ERR_NOTREGISTERED(cmd.getCmdName()));
 	if (cmd == "NICK")

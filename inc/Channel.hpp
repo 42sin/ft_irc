@@ -36,6 +36,9 @@ public:
 	size_t		getAmountUsers(void) const { return _connectedClients.size(); }
 	int			getUserlimit(void) const { return _userLimit; }
 
+	void		appendToMode(char c) { _modes += c; }
+	void		eraseFromMode(size_t i) { _modes.erase(i, 1); }
+
 	void		setInviteOnly(bool b) { _inviteOnlyMode = b; }
 	void		setTopicRestrictions(bool b) { _topicMode = b; }
 	void		setPasswordMode(bool b) { _channelKeyMode = b; }
