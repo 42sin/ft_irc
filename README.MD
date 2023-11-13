@@ -1,0 +1,1 @@
+This is my own simple IRC chat server
