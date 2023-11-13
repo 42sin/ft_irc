@@ -98,7 +98,7 @@ I used [`WeeChat`]  as a reference client.
   <li><code>USER</code> Sets a Username</li>
   <li><code>NICK</code> Sets a Nickname</li>
   <li><code>OPER</code> Sets a new Operator</li>
-  <li><code>PRIVMSG | NOTICE</code> Sends a private message</li>
+  <li><code>PRIVMSG</code> | <code>NOTICE</code> Sends a private message</li>
 </ul>
 
 ### Channel:
