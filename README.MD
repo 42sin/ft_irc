@@ -1,44 +1,106 @@
-# IRC
-## Description
-This is a simple IRC server inspired by the [`RFC 2812`] and following the C++ 98 standard.
+<a name="readme-top"></a>
 
-It can be used with a real IRC client to participate in chat rooms, send private messages to one or multiple users and allows for the management of access modes and permissions. 
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/42sin/ft_irc">
+    <img src="logo.png" alt="Logo" width="128" height="128">
+  </a>
 
-Although  [`WeeChat`] was used as a reference client during implementation, the server is functional with most clients that sends packets terminated with `\r\n`.
+<h3 align="center">ft_irc</h3>
 
-The Server follows the [`reactor`] design pattern and therefore handles concurrent service requests by one or more inputs by dispatching them synchronously to the associated request handlers.
+  <p align="center">
+    Your own IRC Server in C++
+    <br />
+    <a href="https://github.com/42sin/ft_irc/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/42sin/ft_irc/issues">Request Feature</a>
+  </p>
+</div>
 
-## Installation
-Clone the project and `make` the executable
 
-	git clone https://github.com/42sin/ft_irc.git
-	cd ft_irc
-	make
 
-Launch the server
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
 
-	./ircserv < port > < password >
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-Launch  [Weechat]
+#### [Go to Subject PDF]
+[![Subject PDF][subjectImage]](en.irc_subject.pdf)
 
-	brew install weechat
-	weechat
-Connect to the IRC Server inside weechat
+This is a simple IRC server based on the [`RFC 2812`] and following the C++ 98 standard. Even though this project mainly follows the RFC, it was not necessary by the Subject PDF, so some behaviours might differentiate from the original protocol. This is the first big project during our 42 Core Curriculum that we had to write in C++. The Server follows the [`reactor`] design pattern and therefore handles concurrent service requests from one or more inputs by dispatching them synchronously to the associated request handlers.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-	/server add <name> <IP-address>/<port> -password=<password>
-	/connect <name>
+<!-- GETTING STARTED -->
+## Getting Started
 
-## Commands
+The Project was mainly tested on macOS.
 
-The following commands are implemented in the server.
+### Prerequisites
 
-| Category        | Commands      
-| --------------- | --------------------------------- |
-| Server          | `SHUTDOWN`, `PING`, `PASS` |
-| User            | `USER`, `NICK`, `OPER` |
-| Channel         | `INVITE`, `JOIN`, `MODE (t, i, m, b)`, `KICK`, `PART`, `TOPIC` |
-| Private message | `PRIVMSG`, `NOTICE` 
+To connect to the server, you need to use an IRC Client that terminates packages with `\r\n`. I used [`Weechat`] as a reference client.
+    ```sh
+    brew install weechat
+    weechat
+    ```
 
-[`RFC 2812`]: https://www.rfc-editor.org/rfc/rfc2812
-[`WeeChat`]: https://weechat.org/
-[`reactor`]: https://en.wikipedia.org/wiki/Reactor_pattern
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/42sin/ft_irc.git && cd ft_irc
+   ```
+3. Compile the project
+   ```sh
+   make
+   ```
+4. Start the server
+   ```sh
+   ./ircserv <port> <password>
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- Features -->
+## Features
+
+### Basics:
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[issues-url]: https://github.com/42sin/ft_irc/issues
+[license-url]: https://github.com/42sin/ft_irc/blob/master/LICENSE.txt
+[subjectImage]: eval.png
+[Go to Subject PDF]: en.ft_irc_subject.pdf
