@@ -56,7 +56,7 @@ The Project was mainly tested on macOS.
 
 ### Prerequisites
 
-To connect to the server, you need to use an IRC Client that terminates packages with `\r\n`. I used [`Weechat`] as a reference client.
+To connect to the server, you need to use an IRC Client that terminates packages with `\r\n`. I used [`WeeChat`]  as a reference client.
     ```sh
     brew install weechat
     weechat
