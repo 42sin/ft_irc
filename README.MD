@@ -102,6 +102,14 @@ I used [`WeeChat`]  as a reference client.
 </ul>
 
 ### Channel:
+<ul>
+  <li><code>INVITE</code> Invite someone to a channel</li>
+  <li><code>JOIN</code> Join or create a new channel</li>
+  <li><code>MODE (t, i, o, k, l)</code> Changes the Channel Mode, see <a href="en.irc_subject.pdf">Subject PDF</a> for more informations</li>
+  <li><code>KICK</code> Ejects a client from a channel</li>
+  <li><code>TOPIC</code> View or change the channel topic</li>
+  <li><code>PART</code> Leave a channel</li>
+</ul>
 
 
 
