@@ -104,3 +104,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [license-url]: https://github.com/42sin/ft_irc/blob/master/LICENSE.txt
 [subjectImage]: eval.png
 [Go to Subject PDF]: en.ft_irc_subject.pdf
+[`RFC 2812`]: https://www.rfc-editor.org/rfc/rfc2812
+[`WeeChat`]: https://weechat.org/
+[`reactor`]: https://en.wikipedia.org/wiki/Reactor_pattern
