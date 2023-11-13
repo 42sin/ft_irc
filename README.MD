@@ -34,9 +34,9 @@ The following commands are implemented in the server.
 
 | Category        | Commands      
 | --------------- | --------------------------------- |
-| Server          | `SHUTDOWN`, `PING`, `QUIT`, `PASS` |
-| User            | `USER`, `MODE` (i, o), `NICK`, `OPER` |
-| Channel         | `INVITE`, `JOIN`, `MODE` (t, i, m, b), `KICK`, `PART`, `TOPIC` |
+| Server          | `SHUTDOWN`, `PING`, `PASS` |
+| User            | `USER`, `NICK`, `OPER` |
+| Channel         | `INVITE`, `JOIN`, `MODE (t, i, m, b)`, `KICK`, `PART`, `TOPIC` |
 | Private message | `PRIVMSG`, `NOTICE` 
 
 [`RFC 2812`]: https://www.rfc-editor.org/rfc/rfc2812
