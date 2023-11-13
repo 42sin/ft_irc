@@ -19,7 +19,6 @@
 </div>
 
 
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -34,7 +33,6 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#license">License</a></li>
   </ol>
@@ -77,12 +75,11 @@ I used [`WeeChat`]  as a reference client.
    ```sh
    ./ircserv <port> <password>
    ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
+5. Connect to the server inside of weechat
+   ```sh
+   /server add <name> <IP-Address>/<port> -password=<password>
+   /connect <name>
+   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -96,15 +93,15 @@ I used [`WeeChat`]  as a reference client.
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See [`LICENSE`] for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [issues-url]: https://github.com/42sin/ft_irc/issues
-[license-url]: https://github.com/42sin/ft_irc/blob/master/LICENSE.txt
+[`LICENSE`]: https://github.com/42sin/ft_irc/blob/master/LICENSE
 [subjectImage]: eval.png
-[Go to Subject PDF]: en.ft_irc_subject.pdf
+[Go to Subject PDF]: en.irc_subject.pdf
 [`RFC 2812`]: https://www.rfc-editor.org/rfc/rfc2812
 [`WeeChat`]: https://weechat.org/
 [`reactor`]: https://en.wikipedia.org/wiki/Reactor_pattern
