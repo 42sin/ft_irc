@@ -86,7 +86,25 @@ I used [`WeeChat`]  as a reference client.
 <!-- Features -->
 ## Features
 
-### Basics:
+### Server:
+<ul>
+  <li><code>SHUTDOWN</code> Shuts down the server, behaves the same as DIE from the RFC 2812</li>
+  <li><code>PING</code> Pings the server, this is done in intervals by WeeChat</li>
+  <li><code>PASS</code> Sends the password to the server, WeeChat does this on your first time connecting</li>
+</ul>
+
+### User:
+<ul>
+  <li><code>USER</code> Sets a Username</li>
+  <li><code>NICK</code> Sets a Nickname</li>
+  <li><code>OPER</code> Sets a new Operator</li>
+  <li><code>PRIVMSG | NOTICE</code> Sends a private message</li>
+</ul>
+
+### Channel:
+
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
