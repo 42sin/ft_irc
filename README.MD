@@ -56,11 +56,12 @@ The Project was mainly tested on macOS.
 
 ### Prerequisites
 
-To connect to the server, you need to use an IRC Client that terminates packages with `\r\n`. I used [`WeeChat`]  as a reference client.
-    ```sh
-    brew install weechat
-    weechat
-    ```
+To connect to the server, you need to use an IRC Client that terminates packages with `\r\n`.<br>
+I used [`WeeChat`]  as a reference client.
+   ```sh
+   brew install weechat
+   weechat
+   ```
 
 ### Installation
 
