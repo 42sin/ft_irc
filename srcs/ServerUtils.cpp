@@ -7,6 +7,14 @@ void	Server::addSocketToPoll(int	socketFd, short events) {
 	_pollFds.push_back(pollFd);
 }
 
+Client*		Server::searchServerForClient(std::string const& nick) {
+	for (size_t i = 0; i < _clients.size(); i++) {
+		if (_clients[i]->getNick() == nick)
+			return _clients[i];
+	}
+	return NULL;
+}
+
 bool	Server::controlPolls(void) {
 	_pollFds.clear();
 	addSocketToPoll(_serverSocketFd, POLLIN);
@@ -22,11 +30,18 @@ bool	Server::controlPolls(void) {
 	return true;
 }
 
+void	newMessage(Client* receiver, std::string const& message) {
+	Command newMessage;
+	newMessage.setClientFd(receiver->getFd());
+	newMessage.setBuffer(message);
+	receiver->commands.push(newMessage);
+}
+
 void	Server::closeConnection(int index) {
 		int clientFd = _pollFds[index].fd;
 		close(clientFd);
 		_pollFds.erase(_pollFds.begin() + index);
-		std::cout << "Client disconnected: " << clientFd << std::endl;
+		std::cout << "Client disconnected" << std::endl;
 		_disconnectedClients.push_back(clientFd);
 }
 
@@ -58,7 +73,7 @@ void	Server::receive(int index) {
 			std::cerr << "Error accepting connection: " << strerror(errno) << std::endl;
 		else {
 			_clients.push_back(new Client(clientFd));
-			std::cout << "New client connected: " << clientFd << std::endl;
+			std::cout << "New client connected" << std::endl;
 		}
 	}
 	else {
@@ -87,7 +102,7 @@ void	Server::receive(int index) {
 			}
 		}
 		if (bytesRead == 0) {
-			std::cout << "Client disconnected: " << clientFd << std::endl;
+			std::cout << "Client disconnected" << std::endl;
 			_disconnectedClients.push_back(clientFd);
 		}
 		else if (bytesRead < 0) {

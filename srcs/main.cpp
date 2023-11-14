@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
 	}
 	try {
 		int	port = std::atoi(argv[1]);
-		if (port <= 0 || std::string(argv[1]).find_first_not_of("0123456789", 0) != std::string::npos) {
+		if (port <= 0 || port > 65535 || std::string(argv[1]).find_first_not_of("0123456789", 0) != std::string::npos) {
 			std::cout << "Invalid port" << std::endl;
 			return 0;
 		}

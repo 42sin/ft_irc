@@ -1,12 +1,5 @@
 #include "../inc/Server.hpp"
 
-bool online = true;
-
-void	shutdown(int sig) {
-	(void)sig;
-	online = false;
-}
-
 Server::Server() :_port(0), _password(NULL), _serverSocketFd(0), _clients(0, 0) {
 }
 
@@ -80,8 +73,4 @@ void	Server::run(void) {
 		}
 		removeDisconnectedClients();
 	}
-}
-
-bool Server::getPassword() {
-	return (_password);
 }

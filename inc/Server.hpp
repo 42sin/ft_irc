@@ -3,6 +3,8 @@
 
 #include "headers.hpp"
 
+void		newMessage(Client *receiver, std::string const& message);
+
 class Server {
 	const int				_port;
 	const char*				_password;
@@ -24,32 +26,30 @@ class Server {
 	Channel*	searchChannelName(std::string& name);
 
 	// Commands
-	void	authenticate(Command& cmd, Client& client);
-	void	makeAdmin(Command& cmd, Client& client);
+	void		authenticate(Command& cmd, Client& client);
+	void		makeAdmin(Command& cmd, Client& client);
 
-	void	setNick(Command& cmd, Client& client);
-	void	setUser(Command& cmd, Client& client);
-	void	setMode(Command& cmd, Client& client);
+	void		setNick(Command& cmd, Client& client);
+	void		setUser(Command& cmd, Client& client);
+	void		setMode(Command& cmd, Client& client);
+	std::string	parseMode(std::vector<std::string>const& mode, Client& client, Channel* ch);
+	
+	Client*		searchServerForClient(std::string const& nick);
 
-	void	sendPing(Command& cmd, Client& client);
-	void	sendMessage(Command& cmd, Client& client);
-	void	sendInvite(Command& cmd, Client& client);
+	void		sendMessage(Command& cmd, Client& client);
+	void		sendInvite(Command& cmd, Client& client);
 
-	void	executeTopic(Command &cmd, Client &client);
+	void		executeTopic(Command &cmd, Client &client);
 
-	void	kickUser(Command& cmd, Client& client);
-	void	joinChannel(Command& cmd, Client& client);
-	void	leaveChannel(Command& cmd, Client& client);
-	void	leaveServer(Command& cmd, Client& client);
-
+	void		kickUser(Command& cmd, Client& client);
+	void		joinChannel(Command& cmd, Client& client);
+	void		leaveChannel(Command& cmd, Client& client);
 
 public:
 	
 	Server();
 	Server(const int port, const char* password);
 	~Server();
-
-	bool getPassword();
 
 	void	run(void);
 };
